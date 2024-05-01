@@ -1664,12 +1664,7 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/colors@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@rescui/colors/-/colors-0.1.6.tgz#d35d22c7b00a2ea508fb10780fd37642c4b51077"
-  integrity sha512-SfFy7W8vlWuRsEpT9VYSVRXGso6PK2pP5BuPnt3d525aW8Rx99kiuKYaqNPdu9p2nh2/XIf+febOl4Q3x/fH1g==
-
-"@rescui/colors@^0.1.9":
+"@rescui/colors@^0.1.6", "@rescui/colors@^0.1.9":
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/@rescui/colors/-/colors-0.1.9.tgz#8d3fff387526c9d235be3c6673a92b8eebaa67d2"
   integrity sha512-ZgMmIuCJERqPsfCY+7I9UvOIWEypyiZ4VdDdHPb/HUy9lxPpfNzV7Fs/RalBJP4wtgsfwR24d4IlYNhpJcunTA==
