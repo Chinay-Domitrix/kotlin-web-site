@@ -1743,10 +1743,10 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/menu@0.9.4":
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.4.tgz#5d0d448d364d684c2a55ec4800157aa09a977fcb"
-  integrity sha512-ha7FN6AOTIk48e4Bc0fdEH5Ehhzt4Vrm0vaRObD9ukjbUxdq1R0aGmlTeXe/GcM2GGfEqfYJnfmSCYdKDxsdaQ==
+"@rescui/menu@0.9.6", "@rescui/menu@^0.9.1":
+  version "0.9.6"
+  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.6.tgz#d3f3e9a08ddebc0cd95d5916dc0b7c1635015794"
+  integrity sha512-Y6YeuCvqv+jQhB2ABByGCH09/0WTcO6fj35mdmr1fV3Maxy4T711ZaYc2GlaoHZXleZrAyWz02D5m5dwFMGJGg==
   dependencies:
     "@babel/runtime-corejs3" "^7.11.0"
     classnames "^2.2.6"
@@ -1757,16 +1757,6 @@
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.8.2.tgz#a1c233dd15c9c57025ca1f894068b1bd54bc6b59"
   integrity sha512-PuHr9lh21mVZEc8CB0vRUTTA+dBi0mbkQ1igExALefQ7MXXdv10jUnIXLWdPzwyrZGpH8cSAixFukORFxo7HmA==
-  dependencies:
-    "@babel/runtime-corejs3" "^7.11.0"
-    classnames "^2.2.6"
-    core-js "^3"
-    nanoid "^3.3.3"
-
-"@rescui/menu@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.1.tgz#dea81f37829051caa19ecc8967b44e64cd901eb8"
-  integrity sha512-RfskXseYMIFnYRRlKxcDkBVl9gSNLnDLSvWhylAF/BSyroALCmZpYNX/C6bR1CC0l1OtKtgDu6DGKPw4hc4UeQ==
   dependencies:
     "@babel/runtime-corejs3" "^7.11.0"
     classnames "^2.2.6"
