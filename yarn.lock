@@ -1743,10 +1743,10 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/menu@0.9.4":
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.4.tgz#5d0d448d364d684c2a55ec4800157aa09a977fcb"
-  integrity sha512-ha7FN6AOTIk48e4Bc0fdEH5Ehhzt4Vrm0vaRObD9ukjbUxdq1R0aGmlTeXe/GcM2GGfEqfYJnfmSCYdKDxsdaQ==
+"@rescui/menu@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.10.1.tgz#6c71401e14624e56077f5d916ddd4c5a01a5317c"
+  integrity sha512-iSvqkdPwOaTfLVkzymkh9RFF+KxDkjR44uBOe9f2X/ldJvYDy0b8hef33WVMYLq8vQy/xDQZ4ViXs9wtnpp56Q==
   dependencies:
     "@babel/runtime-corejs3" "^7.11.0"
     classnames "^2.2.6"

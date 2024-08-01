@@ -20,7 +20,7 @@
     "@rescui/focus-manager": "^0.1.4",
     "@rescui/icons": "0.13.1",
     "@rescui/input": "^0.8.2",
-    "@rescui/menu": "0.9.4",
+    "@rescui/menu": "0.10.1",
     "@rescui/switcher": "^0.5.1",
     "@rescui/tab-list": "^0.11.1",
     "@rescui/tag": "^0.6.2",
