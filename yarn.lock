@@ -1654,13 +1654,13 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/checkbox@^0.4.13":
-  version "0.4.13"
-  resolved "https://registry.yarnpkg.com/@rescui/checkbox/-/checkbox-0.4.13.tgz#5d16629678df7c03b2b8257b6574e46ffdc91bed"
-  integrity sha512-/fSaix9Zat75vz/Snm1sOCy4lN5hICyMijosDoqTCtTjH3OKW6T8OP0y09hSIklF/NqBTkgHzpTP5p/69ZNYWQ==
+"@rescui/checkbox@^0.8.5":
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/@rescui/checkbox/-/checkbox-0.8.5.tgz#843e84062f5bceaa6054be1474458f279f9ac6f9"
+  integrity sha512-rd2NS2hL0BN6nexBk+bgCSEuY/mW6iqSRAgVa2lJhzdgt4risrhx+4/EAp7DtCJFPhWDtJZUt9tpqe9FwgOu0A==
   dependencies:
     "@babel/runtime-corejs3" "^7.14.0"
-    "@rescui/menu" "^0.8.2"
+    "@rescui/menu" "^0.10.9"
     classnames "^2.2.6"
     core-js "^3.9.1"
 
@@ -1743,7 +1743,7 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/menu@0.9.4":
+"@rescui/menu@0.9.4", "@rescui/menu@^0.9.1":
   version "0.9.4"
   resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.4.tgz#5d0d448d364d684c2a55ec4800157aa09a977fcb"
   integrity sha512-ha7FN6AOTIk48e4Bc0fdEH5Ehhzt4Vrm0vaRObD9ukjbUxdq1R0aGmlTeXe/GcM2GGfEqfYJnfmSCYdKDxsdaQ==
@@ -1753,20 +1753,10 @@
     core-js "^3"
     nanoid "^3.3.3"
 
-"@rescui/menu@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.8.2.tgz#a1c233dd15c9c57025ca1f894068b1bd54bc6b59"
-  integrity sha512-PuHr9lh21mVZEc8CB0vRUTTA+dBi0mbkQ1igExALefQ7MXXdv10jUnIXLWdPzwyrZGpH8cSAixFukORFxo7HmA==
-  dependencies:
-    "@babel/runtime-corejs3" "^7.11.0"
-    classnames "^2.2.6"
-    core-js "^3"
-    nanoid "^3.3.3"
-
-"@rescui/menu@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.1.tgz#dea81f37829051caa19ecc8967b44e64cd901eb8"
-  integrity sha512-RfskXseYMIFnYRRlKxcDkBVl9gSNLnDLSvWhylAF/BSyroALCmZpYNX/C6bR1CC0l1OtKtgDu6DGKPw4hc4UeQ==
+"@rescui/menu@^0.10.9":
+  version "0.10.9"
+  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.10.9.tgz#4de19e4ed0e95cf2ff3d5d685f67491e5429fcf8"
+  integrity sha512-mGWh9OQX3TXH8ism6iCc1wqHQ85W3/LMo8R/vFJZpTMxicJb75IT1hwgwcDVCnV8e0/PZ8kHATlMOY0sjmVzpA==
   dependencies:
     "@babel/runtime-corejs3" "^7.11.0"
     classnames "^2.2.6"
