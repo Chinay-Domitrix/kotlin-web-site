@@ -44,7 +44,7 @@
     "extend": "3.0.2",
     "file-loader": "6.2.0",
     "formik": "2.2.9",
-    "google-map-react": "2.1.10",
+    "google-map-react": "2.2.1",
     "inter-ui": "3.19.3",
     "iso-639-1": "2.1.13",
     "jquery": "3.5.0",
