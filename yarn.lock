@@ -1230,13 +1230,13 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime-corejs3@^7.11.0", "@babel/runtime-corejs3@^7.14.0":
-  version "7.21.5"
-  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs3/-/runtime-corejs3-7.21.5.tgz#a6d4e132ab1cb2fae2354f02284ebb6e07b4f7d8"
-  integrity sha512-FRqFlFKNazWYykft5zvzuEl1YyTDGsIRrjV9rvxvYkUC7W/ueBng1X68Xd6uRMzAaJ0xMKn08/wem5YS1lpX8w==
+"@babel/runtime-corejs3@^7.11.0", "@babel/runtime-corejs3@^7.14.0", "@babel/runtime-corejs3@^7.26.0":
+  version "7.27.0"
+  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs3/-/runtime-corejs3-7.27.0.tgz#c766df350ec7a2caf3ed64e3659b100954589413"
+  integrity sha512-UWjX6t+v+0ckwZ50Y5ShZLnlk95pP5MyW/pon9tiYzl3+18pkTHTFNTKr7rQbfRXPkowt2QAn30o1b6oswszew==
   dependencies:
-    core-js-pure "^3.25.1"
-    regenerator-runtime "^0.13.11"
+    core-js-pure "^3.30.2"
+    regenerator-runtime "^0.14.0"
 
 "@babel/runtime@7.0.0":
   version "7.0.0"
@@ -1706,14 +1706,13 @@
     "@babel/runtime-corejs3" "^7.14.0"
     core-js "^3.9.1"
 
-"@rescui/icons@0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@rescui/icons/-/icons-0.13.1.tgz#90a4598b5fbc2424bdd454acf74c40695bc01b01"
-  integrity sha512-Q6OKdYOjph7GV1Ou/y3hv+ACAjSDGD9pNF/xELMlBN3y10cFvNFulUSvBrDSeIO39tmuM171nvxGOWU+mv2rvA==
+"@rescui/icons@0.16.15":
+  version "0.16.15"
+  resolved "https://registry.yarnpkg.com/@rescui/icons/-/icons-0.16.15.tgz#0ee4ae9a59819e552557c1cb849bb0f3d0a912f0"
+  integrity sha512-wJNMRAmHtuV3zrcdJWOfnX8wgC8eMQ/ZwfUjhnTZaS4DDna95lkKbjC09hsc8JrE+t+zbdWp1s/lvHN1ld5JXw==
   dependencies:
-    "@babel/runtime-corejs3" "^7.14.0"
+    "@babel/runtime-corejs3" "^7.26.0"
     classnames "^2.2.6"
-    core-js "^3.9.1"
 
 "@rescui/icons@^0.11.2":
   version "0.11.2"
@@ -3481,10 +3480,10 @@ core-js-compat@^3.25.1:
   dependencies:
     browserslist "^4.21.5"
 
-core-js-pure@^3.25.1:
-  version "3.30.2"
-  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.30.2.tgz#005a82551f4af3250dcfb46ed360fad32ced114e"
-  integrity sha512-p/npFUJXXBkCCTIlEGBdghofn00jWG6ZOtdoIXSJmAu2QBvN0IqpZXWweOytcwE6cfx8ZvVUy1vw8zxhe4Y2vg==
+core-js-pure@^3.30.2:
+  version "3.41.0"
+  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.41.0.tgz#349fecad168d60807a31e83c99d73d786fe80811"
+  integrity sha512-71Gzp96T9YPk63aUvE5Q5qP+DryB4ZloUZPSOebGM88VNw8VNfvdA7z6kGA8iGOTEzAomsRidp4jXSmUIJsL+Q==
 
 core-js@3.19.0:
   version "3.19.0"
