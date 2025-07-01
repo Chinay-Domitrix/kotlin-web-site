@@ -1230,13 +1230,12 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime-corejs3@^7.11.0", "@babel/runtime-corejs3@^7.14.0":
-  version "7.21.5"
-  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs3/-/runtime-corejs3-7.21.5.tgz#a6d4e132ab1cb2fae2354f02284ebb6e07b4f7d8"
-  integrity sha512-FRqFlFKNazWYykft5zvzuEl1YyTDGsIRrjV9rvxvYkUC7W/ueBng1X68Xd6uRMzAaJ0xMKn08/wem5YS1lpX8w==
+"@babel/runtime-corejs3@^7.11.0", "@babel/runtime-corejs3@^7.14.0", "@babel/runtime-corejs3@^7.26.0":
+  version "7.27.6"
+  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs3/-/runtime-corejs3-7.27.6.tgz#97644153808a62898e7c05f3361501417db3c48b"
+  integrity sha512-vDVrlmRAY8z9Ul/HxT+8ceAru95LQgkSKiXkSYZvqtbkPSfhZJgpRp45Cldbh1GJ1kxzQkI70AqyrTI58KpaWQ==
   dependencies:
-    core-js-pure "^3.25.1"
-    regenerator-runtime "^0.13.11"
+    core-js-pure "^3.30.2"
 
 "@babel/runtime@7.0.0":
   version "7.0.0"
@@ -1654,15 +1653,14 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/checkbox@^0.4.13":
-  version "0.4.13"
-  resolved "https://registry.yarnpkg.com/@rescui/checkbox/-/checkbox-0.4.13.tgz#5d16629678df7c03b2b8257b6574e46ffdc91bed"
-  integrity sha512-/fSaix9Zat75vz/Snm1sOCy4lN5hICyMijosDoqTCtTjH3OKW6T8OP0y09hSIklF/NqBTkgHzpTP5p/69ZNYWQ==
+"@rescui/checkbox@^0.8.13":
+  version "0.8.13"
+  resolved "https://registry.yarnpkg.com/@rescui/checkbox/-/checkbox-0.8.13.tgz#d48772e7776af184111425b7302795da76ef5e60"
+  integrity sha512-HKEG1C0U9g8x2dJx+Kswc4N0vsyVYfdAb1kxYZdM+cADe1EDGmknwdYWedM4w+S9tADIatw49ogrrH+eDpJISQ==
   dependencies:
-    "@babel/runtime-corejs3" "^7.14.0"
-    "@rescui/menu" "^0.8.2"
+    "@babel/runtime-corejs3" "^7.26.0"
+    "@rescui/menu" "^0.10.17"
     classnames "^2.2.6"
-    core-js "^3.9.1"
 
 "@rescui/colors@^0.1.6":
   version "0.1.6"
@@ -1743,7 +1741,7 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/menu@0.9.4":
+"@rescui/menu@0.9.4", "@rescui/menu@^0.9.1":
   version "0.9.4"
   resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.4.tgz#5d0d448d364d684c2a55ec4800157aa09a977fcb"
   integrity sha512-ha7FN6AOTIk48e4Bc0fdEH5Ehhzt4Vrm0vaRObD9ukjbUxdq1R0aGmlTeXe/GcM2GGfEqfYJnfmSCYdKDxsdaQ==
@@ -1753,24 +1751,13 @@
     core-js "^3"
     nanoid "^3.3.3"
 
-"@rescui/menu@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.8.2.tgz#a1c233dd15c9c57025ca1f894068b1bd54bc6b59"
-  integrity sha512-PuHr9lh21mVZEc8CB0vRUTTA+dBi0mbkQ1igExALefQ7MXXdv10jUnIXLWdPzwyrZGpH8cSAixFukORFxo7HmA==
+"@rescui/menu@^0.10.17":
+  version "0.10.17"
+  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.10.17.tgz#455e4a6d7b0d82a863fd1097c22d69a86cb746f2"
+  integrity sha512-3uBm5jmA3taw9B5/wNeNceZCbbzmrHrTTFZce/P2x+dxB3jDkx6nNJkZYncmtAPxguQYBdL4VR5UFCMFL5ti1Q==
   dependencies:
-    "@babel/runtime-corejs3" "^7.11.0"
+    "@babel/runtime-corejs3" "^7.26.0"
     classnames "^2.2.6"
-    core-js "^3"
-    nanoid "^3.3.3"
-
-"@rescui/menu@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.9.1.tgz#dea81f37829051caa19ecc8967b44e64cd901eb8"
-  integrity sha512-RfskXseYMIFnYRRlKxcDkBVl9gSNLnDLSvWhylAF/BSyroALCmZpYNX/C6bR1CC0l1OtKtgDu6DGKPw4hc4UeQ==
-  dependencies:
-    "@babel/runtime-corejs3" "^7.11.0"
-    classnames "^2.2.6"
-    core-js "^3"
     nanoid "^3.3.3"
 
 "@rescui/switcher@^0.5.1":
@@ -3481,10 +3468,10 @@ core-js-compat@^3.25.1:
   dependencies:
     browserslist "^4.21.5"
 
-core-js-pure@^3.25.1:
-  version "3.30.2"
-  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.30.2.tgz#005a82551f4af3250dcfb46ed360fad32ced114e"
-  integrity sha512-p/npFUJXXBkCCTIlEGBdghofn00jWG6ZOtdoIXSJmAu2QBvN0IqpZXWweOytcwE6cfx8ZvVUy1vw8zxhe4Y2vg==
+core-js-pure@^3.30.2:
+  version "3.43.0"
+  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.43.0.tgz#4df9c949c7abde839a8398d16a827a76856b1f0c"
+  integrity sha512-i/AgxU2+A+BbJdMxh3v7/vxi2SbFqxiFmg6VsDwYB4jkucrd1BZNA9a9gphC0fYMG5IBSgQcbQnk865VCLe7xA==
 
 core-js@3.19.0:
   version "3.19.0"
