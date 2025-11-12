@@ -1,5 +1,7 @@
 [//]: # (title: Nullability in Java and Kotlin)
-[//]: # (description: Learn how to migrate nullable constructions from Java to Kotlin. This guide covers support for nullable types in Kotlin, how Kotlin treats nullable annotations from Java, and more.)
+
+<web-summary>Learn how to migrate nullable constructions from Java to Kotlin. This guide covers support for nullable types in Kotlin, 
+how Kotlin treats nullable annotations from Java, and more.</web-summary>
 
 _Nullability_ is the ability of a variable to hold a `null` value.
 When a variable contains `null`, an attempt to dereference the variable leads to a `NullPointerException`.
@@ -27,7 +29,7 @@ That means there's almost no runtime overhead for working with nullable types in
 > We say "almost" because, even though [intrinsic](https://en.wikipedia.org/wiki/Intrinsic_function) checks _are_ generated,
 their overhead is minimal.
 >
-{type="note"}
+{style="note"}
 
 In Java, if you don't write null checks, methods may throw a `NullPointerException`:
 
@@ -85,8 +87,8 @@ After the check is passed successfully, the compiler treats the variable as if i
 in the scope where the compiler performs the check.
 
 If you don't perform this check, the code will fail to compile with the following message:
-"Only [safe (?.)](null-safety.md#safe-calls) or [non-nullable asserted (!!.) calls](null-safety.md#the-operator) are allowed
-on a [nullable receiver](extensions.md#nullable-receiver) of type String?".
+"Only [safe (?.)](null-safety.md#safe-call-operator) or [non-nullable asserted (!!.) calls](null-safety.md#not-null-assertion-operator) are allowed
+on a [nullable receiver](extensions.md#nullable-receivers) of type String?".
 
 You can write the same shorter – use the [safe-call operator ?. (If-not-null shorthand)](idioms.md#if-not-null-shorthand), 
 which allows you to combine a null check and a method call into a single operation:
@@ -101,8 +103,8 @@ fun stringLength(a: String?): Int = a?.length ?: 0
 
 In Java, you can use annotations showing whether a variable can or cannot be `null`.
 Such annotations aren't part of the standard library, but you can add them separately.
-For example, you can use the JetBrains annotations `@Nullable` and `@NotNull` (from the `org.jetbrains.annotations` package)
-or annotations from Eclipse (`org.eclipse.jdt.annotation`).
+For example, you can use JetBrains annotations `@Nullable` and `@NotNull` (from the `org.jetbrains.annotations` package),
+annotations from [JSpecify](https://jspecify.dev/) (`org.jspecify.annotations`), or from Eclipse (`org.eclipse.jdt.annotation`).
 Kotlin can recognize such annotations when you're [calling Java code from Kotlin code](java-interop.md#nullability-annotations)
 and will treat types according to their annotations.
 
@@ -216,7 +218,7 @@ findOrder()?.customer?.let(::processCustomer)
 
 ## Default values instead of null
 
-Checking for `null` is often used in combination with [setting the default value](functions.md#default-arguments)
+Checking for `null` is often used in combination with [setting the default value](functions.md#parameters-with-default-values)
 in case the null check is successful.
 
 The Java code with a null check:
@@ -335,7 +337,51 @@ To make it return `null`, you can use the [_boxed_ type](https://docs.oracle.com
 However, it's more resource-efficient to make such functions return a negative value and then check the value –
 you would do the check anyway, but no additional boxing is performed this way.
 >
-{type="note"}
+{style="note"}
+
+When migrating Java code to Kotlin, you may want to initially use the regular cast operator `as` with a nullable type
+to preserve the original semantics of your code. However, we recommend adapting your code to use the safe cast operator `as?`
+for a safer and more idiomatic approach. For example, if you have the following Java code:
+
+```java
+public class UserProfile {
+    Object data;
+
+    public static String getUsername(UserProfile profile) {
+        if (profile == null) {
+            return null;
+        }
+        return (String) profile.data;
+    }
+}
+```
+
+Migrating this directly with the `as` operator gives you:
+
+```kotlin
+class UserProfile(var data: Any? = null)
+
+fun getUsername(profile: UserProfile?): String? {
+    if (profile == null) {
+        return null
+    }
+    return profile.data as String?
+}
+```
+
+Here, `profile.data` is cast to a nullable string using `as String?`.
+
+We recommend going one step further and using `as? String` to safely cast the value. This approach returns `null`
+on failure instead of throwing a `ClassCastException`:
+
+```kotlin
+class UserProfile(var data: Any? = null)
+
+fun getUsername(profile: UserProfile?): String? =
+  profile?.data as? String
+```
+
+This version replaces the `if` expression with the [safe call operator](null-safety.md#safe-call-operator) `?.`, which safely accesses the data property before attempting the cast.
 
 ## What's next?
 

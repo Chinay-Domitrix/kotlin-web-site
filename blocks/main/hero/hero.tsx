@@ -1,9 +1,10 @@
 import React, { FC, ReactNode } from 'react';
-import Button from '@rescui/button';
+import { Button } from '@rescui/button';
 import cn from 'classnames';
 
-import { useTextStyles, createTextCn } from '@rescui/typography';
+import { createTextCn } from '@rescui/typography';
 import { ThemeProvider } from '@rescui/ui-contexts';
+import  heroBannerDataRaw from '../../../data/hero-banner.yml';
 
 import Image from 'next/image';
 
@@ -20,14 +21,23 @@ interface Props {
     children: ReactNode;
 }
 
+type HeroBannerData = {
+    title: string;
+    caption: string;
+    variant?: string;
+    buttonLabel: string;
+    buttonUrl: string;
+}[];
+
+const heroBannerList = heroBannerDataRaw as HeroBannerData;
+
 export const HeroSection: FC<Props> = ({ children, title }) => {
-    const textCn = useTextStyles();
     const darkTextCn = createTextCn('dark');
 
     return (
         <ThemeProvider theme={'dark'}>
-            <section className={styles.heroSection}>
-                <div className={cn('ktl-layout', 'ktl-layout--center')}>
+            <section className={cn(styles.heroSection)} data-testid={"hero-block"}>
+                <div className={cn('ktl-layout', 'ktl-layout--center', 'hero-b')}>
                     <div className={styles.grid}>
                         <div className={styles.content}>
                             <h1 className={cn(darkTextCn('rs-hero'), styles.heroText)}>{title}</h1>
@@ -40,19 +50,29 @@ export const HeroSection: FC<Props> = ({ children, title }) => {
                                     Get started
                                 </Button>
                                 <div className={styles.developer}>
-                                    <img src={JBLogo.src} alt="jetbrains logo" className={styles.developerLogo} />{' '}
-                                    <div className={darkTextCn('rs-text-3', { hardness: 'hard' })}>
-                                        Developed by&nbsp;
+                                    <div className={styles.developerContent}>
+                                        <div className={cn(darkTextCn('rs-text-2', { hardness: 'hard' }), styles.developerCaption)}>Developed by</div>
                                         <a
                                             href="https://www.jetbrains.com/"
-                                            className={darkTextCn('rs-link', { hardness: 'hard' })}
                                             target={'_blank'}
                                             rel={'noreferrer noopener'}
                                         >
-                                            JetBrains
-                                        </a>.
+                                            <img src={JBLogo.src} alt="jetbrains logo" className={styles.developerLogo} />{' '}
+                                        </a>
                                     </div>
                                 </div>
+                                {(heroBannerList||[]).map((banner, i) => <div
+                                    key={banner.variant || i}
+                                    className={styles.banner}
+                                    data-banner-variant={banner.variant || null}
+                                >
+                                    <div className={cn(styles.bannerContent)}>
+                                        <h5 className={cn(darkTextCn('rs-h2'), styles.bannerTitle)}>{banner.title}</h5>
+                                        <p className={cn(darkTextCn('rs-text-2'), styles.bannerCaption)}>{banner.caption}</p>
+                                    </div>
+                                    <Button mode="outline" size="m" href={banner.buttonUrl}
+                                            className={styles.bannerButton}>{banner.buttonLabel}</Button>
+                                </div>)}
                             </div>
                         </div>
 
@@ -61,6 +81,8 @@ export const HeroSection: FC<Props> = ({ children, title }) => {
                             src={HeroImg.src}
                             srcSet={`${HeroImg2x.src} 2x`}
                             alt="kotlin"
+                            height="560"
+                            width="560"
                         />
                     </div>
                 </div>

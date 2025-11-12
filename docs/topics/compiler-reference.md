@@ -9,7 +9,7 @@ These compilers are used by:
 * Maven, when you call `mvn compile` or `mvn test-compile` in a console or in the IDE.
 
 You can also run Kotlin compilers manually from the command line as described 
-in the [Working with command-line compiler](command-line.md) tutorial. 
+in the [Working with command-line compiler](command-line.md) tutorial.
 
 ## Compiler options
 
@@ -25,18 +25,24 @@ For details, see [Gradle compiler options](gradle-compiler-options.md#how-to-def
 For details, see [Maven](maven.md#specify-compiler-options).
 * If you run a command-line compiler, add the compiler arguments directly to the utility call or write them into an [argfile](#argfile).
 
-For example: 
+  For example:
 
-```bash
-$ kotlinc hello.kt -include-runtime -d hello.jar
-```
+  ```bash
+  $ kotlinc hello.kt -include-runtime -d hello.jar
+  ```
 
->On Windows, when you pass compiler arguments that contain delimiter characters (whitespace, `=`, `;`, `,`),
->surround these arguments with double quotes (`"`).
->```
->$ kotlinc.bat hello.kt -include-runtime -d "My Folder\hello.jar"
->```
-{type="note"}
+  > On Windows, when you pass compiler arguments that contain delimiter characters (whitespace, `=`, `;`, `,`),
+  > surround these arguments with double quotes (`"`).
+  > ```
+  > $ kotlinc.bat hello.kt -include-runtime -d "My Folder\hello.jar"
+  > ```
+  {style="note"}
+
+## Schema for compiler options
+
+A common schema for all compiler options is published under [`org.jetbrains.kotlin:kotlin-compiler-arguments-description`](https://central.sonatype.com/artifact/org.jetbrains.kotlin/kotlin-compiler-arguments-description)
+as a JAR artifact. This artifact includes both a code representation and a JSON equivalent of all compiler option
+descriptions (for non-Kotlin consumers). As well as metadata, such as the version in which each option was introduced or stabilized.
 
 ## Common options
 
@@ -45,14 +51,6 @@ The following options are common for all Kotlin compilers.
 ### -version
 
 Display the compiler version.
-
-### -nowarn
-
-Suppress the compiler from displaying warnings during compilation.
-
-### -Werror
-
-Turn any warnings into a compilation error. 
 
 ### -verbose
 
@@ -70,6 +68,8 @@ To show advanced options, use `-X`.
 
 ### -X
 
+<primary-label ref="experimental-general"/>
+
 Display information about the advanced options and exit. These options are currently unstable: 
 their names and behavior may be changed without notice.
 
@@ -77,10 +77,10 @@ their names and behavior may be changed without notice.
 
 Specify a custom path to the Kotlin compiler used for the discovery of runtime libraries.
   
-### -P plugin:_pluginId_:_optionName_=_value_
+### -P plugin:pluginId:optionName=value
 
 Pass an option to a Kotlin compiler plugin.
-Available plugins and their options are listed in the **Tools > Compiler plugins** section of the documentation.
+Core plugins and their options are listed in the [Core compiler plugins](components-stability.md#core-compiler-plugins) section of the documentation.
   
 ### -language-version _version_
 
@@ -99,14 +99,13 @@ instead of going through a graceful migration cycle.
 Code written in the progressive mode is backwards compatible; however, code written in
 a non-progressive mode may cause compilation errors in the progressive mode.
 
-### @_argfile_
+### @argfile
 
 Read the compiler options from the given file. Such a file can contain compiler options with values 
 and paths to the source files. Options and paths should be separated by whitespaces. For example:
 
 ```
--include-runtime -d hello.jar
-hello.kt
+-include-runtime -d hello.jar hello.kt
 ```
 
 To pass values that contain whitespaces, surround them with single (**'**) or double (**"**) quotes. If a value contains 
@@ -131,6 +130,109 @@ $ kotlinc @options/compiler.options hello.kt
 
 Enable usages of API that [requires opt-in](opt-in-requirements.md) with a requirement annotation with the given 
 fully qualified name.
+
+### -Xrepl
+
+<primary-label ref="experimental-general"/>
+
+Activates the Kotlin REPL.
+
+```bash
+kotlinc -Xrepl
+```
+
+### -Xannotation-target-all
+
+<primary-label ref="experimental-general"/>
+
+Enables the experimental [`all` use-site target for annotations](annotations.md#all-meta-target):
+
+```bash
+kotlinc -Xannotation-target-all
+```
+
+### -Xannotation-default-target=param-property
+
+<primary-label ref="experimental-general"/>
+
+Enables the new experimental [defaulting rule for annotation use-site targets](annotations.md#defaults-when-no-use-site-targets-are-specified):
+
+```bash
+kotlinc -Xannotation-default-target=param-property
+```
+
+### Warning management
+
+#### -nowarn
+
+Suppress all warnings during compilation.
+
+#### -Werror
+
+Treat all warnings as compilation errors.
+
+#### -Wextra
+
+Enable [additional declaration, expression, and type compiler checks](whatsnew21.md#extra-compiler-checks) that
+emit warnings if true.
+
+#### -Xrender-internal-diagnostic-names
+<primary-label ref="experimental-general"/>
+
+Prints internal diagnostic names alongside warnings. This is useful for identifying the `DIAGNOSTIC_NAME` configured for the `-Xwarning-level` option.
+
+#### -Xwarning-level
+<primary-label ref="experimental-general"/>
+
+Configure the severity level of specific compiler warnings:
+
+```bash
+kotlinc -Xwarning-level=DIAGNOSTIC_NAME:(error|warning|disabled)
+```
+
+* `error`: raises only the specified warning to an error.
+* `warning`: emits a warning for the specified diagnostic and is enabled by default.
+* `disabled`: suppresses only the specified warning module-wide.
+
+You can adjust warning reporting in your project by combining module-wide rules with specific ones:
+
+| Command                                            | Description                                                 |
+|----------------------------------------------------|-------------------------------------------------------------|
+| `-nowarn -Xwarning-level=DIAGNOSTIC_NAME:warning`  | Suppress all warnings except for the specified ones.        |
+| `-Werror -Xwarning-level=DIAGNOSTIC_NAME:warning`  | Raise all warnings to errors except for the specified ones. |
+| `-Wextra -Xwarning-level=DIAGNOSTIC_NAME:disabled` | Enable all additional checks except for the specified ones. |
+
+If you have many warnings to exclude from the general rules, you can list them in a separate file using [`@argfile`](#argfile).
+
+You can use [`-Xrender-internal-diagnostic-names`](#xrender-internal-diagnostic-names) to discover the `DIAGNOSTIC_NAME`.
+
+### -Xdata-flow-based-exhaustiveness
+<primary-label ref="experimental-general"/>
+
+Enables data-flow–based exhaustiveness checks for `when` expressions.
+
+### -Xallow-reified-type-in-catch
+<primary-label ref="experimental-general"/>
+
+Enables support for reified `Throwable` type parameters in `catch` clauses of `inline` functions.
+
+### Kotlin contract options
+<primary-label ref="experimental-general"/>
+
+The following options enable experimental Kotlin contract features.
+
+#### -Xallow-contracts-on-more-functions
+
+Enables contracts in additional declarations, including property accessors, specific operator functions,
+and type assertions on generic types.
+
+#### -Xallow-condition-implies-returns-contracts
+
+Allows using the `returnsNotNull()` function in contracts to assume a non-null return value for specified conditions.
+
+#### -Xallow-holdsin-contract
+
+Allows using the `holdsIn` keyword in contracts to assume that a boolean condition is `true` inside a lambda.
 
 ## Kotlin/JVM compiler options
 
@@ -160,17 +262,19 @@ Use a custom JDK home directory to include into the classpath if it differs from
 
 ### -Xjdk-release=version
 
+<primary-label ref="experimental-general"/>
+
 Specify the target version of the generated JVM bytecode. Limit the API of the JDK in the classpath to the specified Java version. 
 Automatically sets [`-jvm-target version`](#jvm-target-version).
-Possible values are `1.8`, `9`, `10`, ..., `21`. The default value is `%defaultJvmTargetVersion%`.
+Possible values are `1.8`, `9`, `10`, ..., `24`.
 
 > This option is [not guaranteed](https://youtrack.jetbrains.com/issue/KT-29974) to be effective for each JDK distribution.
 >
-{type="note"}
+{style="note"}
 
 ### -jvm-target _version_
 
-Specify the target version of the generated JVM bytecode. Possible values are `1.8`, `9`, `10`, ..., `21`.
+Specify the target version of the generated JVM bytecode. Possible values are `1.8`, `9`, `10`, ..., `24`.
 The default value is `%defaultJvmTargetVersion%`.
 
 ### -java-parameters
@@ -198,12 +302,34 @@ into the classpath.
 
 Script definition template classes. Use fully qualified class names and separate them with commas (**,**).
 
+### -Xjvm-expose-boxed
+
+<primary-label ref="experimental-general"/>
+
+Generate boxed versions of all inline value classes in the module, along with boxed variants of functions that use them,
+making both accessible from Java. For more information, see [Inline value classes](java-to-kotlin-interop.md#inline-value-classes)
+in the guide to calling Kotlin from Java.
+
+### -jvm-default _mode_
+
+Control how functions declared in interfaces are compiled to default methods on the JVM.
+
+| Mode               | Description                                                                                                                       |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `enable`           | Generates default implementations in interfaces and includes bridge functions in subclasses and `DefaultImpls` classes. (Default) |
+| `no-compatibility` | Generates only default implementations in interfaces, skipping compatibility bridges and `DefaultImpls` classes.                  |
+| `disable`          | Generates only compatibility bridges and `DefaultImpls` classes, skipping default methods.                                        |
+
 ## Kotlin/JS compiler options
 
 The Kotlin compiler for JS compiles Kotlin source files into JavaScript code. 
 The command-line tool for Kotlin to JS compilation is `kotlinc-js`.
 
 In addition to the [common options](#common-options), Kotlin/JS compiler has the options listed below.
+
+### -target {es5|es2015}
+
+Generate JS files for the specified ECMA version.
 
 ### -libraries _path_
 
@@ -272,6 +398,11 @@ Add variable and function names that you declared in Kotlin code into the source
 
 Add the specified prefix to paths in the source map.
 
+### -Xes-long-as-bigint
+<primary-label ref="experimental-general"/>
+
+Enable support for the JavaScript `BigInt` type to represent Kotlin `Long` values when compiling to modern JavaScript (ES2020).
+
 ## Kotlin/Native compiler options
 
 Kotlin/Native compiler compiles Kotlin source files into native binaries for the [supported platforms](native-overview.md#target-platforms). 
@@ -285,7 +416,8 @@ Enable runtime assertions in the generated code.
 
 ### -g
 
-Enable emitting debug information.
+Enable emitting debug information. This option lowers the optimization level and should not be combined with
+the [`-opt`](#opt) option.
     
 ### -generate-test-runner (-tr)
 
@@ -328,7 +460,7 @@ Include the native bitcode library.
 
 ### -no-default-libs
 
-Disable linking user code with the [default platform libraries](native-platform-libs.md) distributed with the compiler.
+Disable linking user code with the prebuilt [platform libraries](native-platform-libs.md) distributed with the compiler.
 
 ### -nomain
 
@@ -352,7 +484,8 @@ Don't link with stdlib.
 
 ### -opt
 
-Enable compilation optimizations.
+Enable compilation optimizations and produce a binary with better runtime performance. It's not recommended to combine it
+with the [`-g`](#g) option, which lowers the optimization level.
 
 ### -output _name_ (-o _name_)
 

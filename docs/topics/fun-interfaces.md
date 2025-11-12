@@ -1,13 +1,14 @@
 [//]: # (title: Functional \(SAM\) interfaces)
 
-An interface with only one abstract method is called a _functional interface_, or a _Single Abstract
-Method (SAM) interface_. The functional interface can have several non-abstract members but only one abstract member.
+An interface with only one abstract member function is called a _functional interface_, or a _Single Abstract
+Method (SAM) interface_. The functional interface can have several non-abstract member functions but only one abstract 
+member function.
 
 To declare a functional interface in Kotlin, use the `fun` modifier.
 
 ```kotlin
 fun interface KRunnable {
-   fun invoke()
+    fun invoke()
 }
 ```
 
@@ -24,7 +25,7 @@ For example, consider the following Kotlin functional interface:
 
 ```kotlin
 fun interface IntPredicate {
-   fun accept(i: Int): Boolean
+    fun accept(i: Int): Boolean
 }
 ```
 
@@ -33,9 +34,9 @@ If you don't use a SAM conversion, you will need to write code like this:
 ```kotlin
 // Creating an instance of a class
 val isEven = object : IntPredicate {
-   override fun accept(i: Int): Boolean {
-       return i % 2 == 0
-   }
+    override fun accept(i: Int): Boolean {
+        return i % 2 == 0
+    }
 }
 ```
 
@@ -50,13 +51,13 @@ A short lambda expression replaces all the unnecessary code.
 
 ```kotlin
 fun interface IntPredicate {
-   fun accept(i: Int): Boolean
+    fun accept(i: Int): Boolean
 }
 
 val isEven = IntPredicate { it % 2 == 0 }
 
 fun main() {
-   println("Is 7 even? - ${isEven.accept(7)}")
+    println("Is 7 even? - ${isEven.accept(7)}")
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.4"}
@@ -74,7 +75,9 @@ interface Printer {
     fun print() 
 }
 
-fun Printer(block: () -> Unit): Printer = object : Printer { override fun print() = block() }
+fun Printer(block: () -> Unit): Printer = object : Printer {
+    override fun print() = block()
+}
 ```
 
 With callable references to functional interface constructors enabled, this code can be replaced with just a functional interface declaration:
@@ -109,7 +112,7 @@ typealias IntPredicate = (i: Int) -> Boolean
 val isEven: IntPredicate = { it % 2 == 0 }
 
 fun main() {
-   println("Is 7 even? - ${isEven(7)}")
+    println("Is 7 even? - ${isEven(7)}")
 }
 ```
 
@@ -117,7 +120,7 @@ However, functional interfaces and [type aliases](type-aliases.md) serve differe
 Type aliases are just names for existing types – they don't create a new type, while functional interfaces do.
 You can provide extensions that are specific to a particular functional interface to be inapplicable for plain functions or their type aliases.
 
-Type aliases can have only one member, while functional interfaces can have multiple non-abstract members and one abstract member.
+Type aliases can have only one member, while functional interfaces can have multiple non-abstract member functions and one abstract member function.
 Functional interfaces can also implement and extend other interfaces.
 
 Functional interfaces are more flexible and provide more capabilities than type aliases, but they can be more costly both syntactically and at runtime because they can require conversions to a specific interface.

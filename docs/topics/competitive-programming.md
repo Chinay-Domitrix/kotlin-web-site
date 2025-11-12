@@ -13,8 +13,8 @@ programming, Kotlin incidentally fits well in this domain, reducing the typical 
 programmer needs to write and read while working with the code almost to the level offered by dynamically-typed 
 scripting languages, while having tooling and performance of a statically-typed language.
 
-See [Get started with Kotlin/JVM](jvm-get-started.md) on how to set up development
-environment for Kotlin. In competitive programming, a single project is usually created and each problem's solution is 
+For more information on how to create a Kotlin project in IntelliJ IDEA, see the [Create a console app](jvm-get-started.md)
+tutorial. In competitive programming, a single project is usually created and each problem's solution is
 written in a single source file.
 
 ## Simple example: Reachable Numbers problem
@@ -101,7 +101,7 @@ fun main() {
 ```
 
 Note the use of Kotlin's
-[null-assertion operator](null-safety.md#the-operator) `!!`
+[null-assertion operator](null-safety.md#not-null-assertion-operator) `!!`
 after the [readLine()](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/read-line.html) function call.
 Kotlin's `readLine()` function is defined to return a
 [nullable type](null-safety.md#nullable-types-and-non-nullable-types)

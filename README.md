@@ -22,7 +22,7 @@ This repository is the source for [https://kotlinlang.org](https://kotlinlang.or
 | [Community](https://kotlinlang.org/community/) | [pages/community](pages/community) | 
 | [Education](https://kotlinlang.org/education/) | [templates/pages/education](templates/pages/education)| 
 
-Note that source files for the [server-side landing page](https://kotlinlang.org/lp/server-side/) and [Kotlin Multiplatform Mobile landing page](https://kotlinlang.org/lp/multiplatform/) are not publicly available.
+Note that source files for the [server-side landing page](https://kotlinlang.org/lp/server-side/) and [Kotlin Multiplatform landing page](https://kotlinlang.org/lp/multiplatform/) are not publicly available.
 
 #### Sources in different repositories
 
@@ -119,6 +119,27 @@ To add an event to the Community Events, do the following:
    You can see the structure and types of the expected configuration in [the JSON schema](/data/schemas/events.json).
 2. Publish the changes creating a pull request. The changes will be validated by [GitHub Actions Workflow](.github/workflows/validate-events-data.yml) to prevent misconfiguration.
 
+### Case Studies
+
+To add a case study, do the following:
+1. Fill the case study info in the [case-studies.yml](/data/case-studies/case-studies.yml) with the next:
+   - `id`, a unique identifier for the case study.
+    - `type`, the case study category: either `multiplatform` or `server-side`.
+    - `description`, a markdown-enabled text description of the case study (supports # header  **bold** and [links](https://example.com), paragraphs are made with two new lines).
+    - `logo` (optional), an array of 0-2 image paths relative to the `/public/` directory.
+    - `signature` (optional), an object with `name` and `position` fields for the quote author.
+    - `isExternal` (optional), a boolean indicating if the case story is from an external source (default: false).
+    - `link` (optional), a URL to the full case story.
+    - `linkText` (optional), custom text for the link (default: "Read the full story").
+    - `linkStyle` (optional), either `button` or `text` for the link style.
+    - `platforms` (optional), an array of platform tags such as `android`, `ios`, `desktop`, `frontend`, `backend`, or `compose-multiplatform`.
+    - `media` (optional), a media object with `type` set to either `youtube` (with `videoId`) or `image` (with `path` relative to `/public/`).
+    - `featuredOnMainPage` (optional), a boolean to mark the case as featured on the main page.
+
+   You can see the structure and types of the expected configuration in [the JSON schema](/data/schemas/case-studies.json) and in the [example file](/data/case-studies/_case-study.example.yaml).
+2. The order of case studies in the file defines the order of their appearance on the website. Place new case studies accordingly.
+3. Publish the changes creating a pull request. The changes will be validated by [GitHub Actions Workflow](.github/workflows/validate-case-studies-data.yml) to prevent misconfiguration.
+
 ## Local deployment
 
 Currently, there is no way to deploy the Kotlin website locally. This ticket tracks the effort of adding support for local testing: [KT-47049](https://youtrack.jetbrains.com/issue/KT-47049).
@@ -136,6 +157,45 @@ You can:
 [project-url]: https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub
 [project-badge]: https://jb.gg/badges/official.svg
 [slack-url]: https://slack.kotlinlang.org
+
+## Local development
+For the frontend development, you need to connect to the WebTeam registry.
+Visit [the registry](https://jetbrains.team/p/wt/packages/npm/npm) page in Space:
+- On the top right, click Connect;
+- Click Generate personal token;
+- Copy your personal token.
+- Add your personal token to the environmental variable. This step differs based on your OS.
+
+##### For macOS:
+Add your token to the ~/.zshenv file:
+- Open the Terminal;
+- Use this command to access .zshenv file `nano ~/.zshenv`;
+- Replace your_token with your actual Space token and use this command to add an environment variable: `export WEBTEAM_UI_NPM_TOKEN=yourtoken`.
+Then install frontend dependencies `npm install`.
+
+#### preliminaries: python3 installed
+
+```
+# install frontend dependencies
+yarn install
+
+# at first start you need to build the static
+yarn run next-build-static
+
+# run NextJS server
+yarn run next-dev
+
+# run webpack dev server for everything else
+yarn start
+
+# install dependencies for the python server
+pip  install --no-build-isolation -r requirements.txt
+
+# run python server
+python3 kotlin-website.py
+```
+Now you can open the website at [http://localhost:9000](http://localhost:9000).
+
 
 ## Pages on Next.js
 
@@ -171,15 +231,31 @@ To run tests locally:
 ## Run Tests
 
 - `yarn test` to run all tests in headless mode locally.
-- `yarn test:e2e` to run e2e tests.
-- `yarn test:e2e:headed` to run e2e tests in headed mode.
-- `yarn test:e2e:debug` to run e2e tests in headed mode with debug.
+- `yarn test:e2e` to run e2e tests locally, visual tests are also included.
+- `yarn test:e2e:skip-visual` to run e2e tests without visual tests locally.
+- `yarn test:production` to run the subset of e2e tests that are meant to check the production locally.
+
+There are also additional options to run tests:
+- `yarn run test:e2e:ci` or `yarn test:production:ci` to run tests in CI environments.
+- `yarn test:e2e:headed` or `yarn test:production:headed` to run tests in headed mode locally.
+- `yarn test:e2e:debug` or `yarn test:production:debug` to run e2e tests in headed mode with debug locally.
+
+To ease the process of adding and maintaining e2e tests:
 - `yarn test:e2e:new` to generate the test for the user interactions.
-- `yarn ci:e2e` to run e2e test in CI environments.
+- `yarn test:e2e:update`  to update screenshots when something on page has changed intentionally.
 
 ## Write Tests
 
 To write e2e test, create spec file `/test/e2e/*your-page*.spec.js`.
+
+## WebHelp tests
+Some e2e tests focus on preventing regressions in the WebHelp components used to build documentation in the /docs section of kotlinlang.org.
+To run these tests locally, follow the next steps:
+1. Create the `dist` folder in the project.
+2. Open the last successful build of [Reference Docs](https://buildserver.labs.intellij.net/buildConfiguration/Kotlin_KotlinSites_KotlinlangTeamcityDsl_BuildReferenceDocs?branch=&mode=builds#all-projects) on TeamCity.
+3. Download the artifacts of this build and place them in the `dist` folder.
+4. Run the tests locally with the following command `yarn run test:e2e`
+5. Run the tests in docker container with the following command `docker compose -f docker-compose-e2e-statics.yml up --build  --exit-code-from playwright`
 
 ## API references tests
 
@@ -190,9 +266,3 @@ To run these tests locally, follow the next steps:
 3. Download the artifacts of these builds and place them in the `libs` folder by their name, for example, `kotlinx.coroutines`.
 4. Up containers `./scripts/dokka/up.sh`.
 5. Run test inside container `./scripts/dokka/run.sh` or on the host with one of the scripts below.
-
-To run visual testing, apply one of the next scripts:  
-- `yarn test:visual` to compare pages with base screenshots. Base screenshots are in `test/visual`.
-- `yarn test:visual:headed` to run visual test in headed mode.
-- `yarn test:visual:update` to update all screenshots, for example, when the page has been changed.
-- `yarn ci:visual` to run visual test in CI environments. 

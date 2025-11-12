@@ -15,7 +15,7 @@ import './style.scss';
 import {SubscriptionForm} from './components/subscription-form';
 import {TeachMap} from './components/teach-map/teach-map.jsx';
 import {SlackIcon} from "@rescui/icons";
-import Button from "@rescui/button";
+import { Button } from "@rescui/button";
 import { TeachLaunchCourse } from "./components/teach-launch-course";
 
 import { useTextStyles } from '@rescui/typography';
@@ -41,7 +41,7 @@ const Teach = (props) => {
                       rel="noopener"
                       className="teach-cta-block-button"
                   >
-                      Join Educators Сommunity
+                      Join Educators Community
                   </Button>
 
                   <Button mode="outline" href="why-teach-kotlin.html" className="teach-cta-block-button">
@@ -121,7 +121,7 @@ const Teach = (props) => {
                           rel="noopener"
                           className="teach-cta-block-button"
                       >
-                          Join Educators Сommunity
+                          Join Educators Community
                       </Button>
 
                       <Button size="l" mode="outline" href="why-teach-kotlin.html" className="teach-cta-block-button">
@@ -259,13 +259,28 @@ const Teach = (props) => {
                                   </a>
                               </li>
                               <li className="teach-list__item">
-                                  <a href="https://plugins.jetbrains.com/plugin/21067-kotlin-onboarding-introduction" className={textCn('rs-link', {external: true})} target="_blank">
-                                      Kotlin Onboarding
+                                  <a href="https://jb.gg/academy/kotlin-onboarding" className={textCn('rs-link', {external: true})} target="_blank">
+                                      Kotlin Onboarding: Introduction
+                                  </a>
+                              </li>
+                               <li className="teach-list__item">
+                                  <a href="https://jb.gg/academy/kotlin-oop" className={textCn('rs-link', {external: true})} target="_blank">
+                                      Kotlin Onboarding: Object-Oriented Programming
+                                  </a>
+                              </li>
+                             <li className="teach-list__item">
+                                  <a href="https://jb.gg/academy/kotlin-collections" className={textCn('rs-link', {external: true})} target="_blank">
+                                      Kotlin Onboarding: Collections
+                                  </a>
+                              </li>
+                             <li className="teach-list__item">
+                                  <a href="https://jb.gg/refactoring-kotlin" className={textCn('rs-link', {external: true})} target="_blank">
+                                      Introduction to IDE Code Refactoring in Kotlin
                                   </a>
                               </li>
                               <li className="teach-list__item">
-                                  <a href="https://drive.google.com/drive/folders/1nN3LuyEfmBaSDZpnb4VA9kDuLakmVXH1" className={textCn('rs-link', {external: true})} target="_blank">
-                                      Programming in Kotlin course materials
+                                  <a href="https://jb.gg/academy/kotlin-algorithm" className={textCn('rs-link', {external: true})} target="_blank">
+                                      Algorithmic Challenges in Kotlin
                                   </a>
                               </li>
 

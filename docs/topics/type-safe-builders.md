@@ -172,10 +172,10 @@ so that it becomes a proper part of the tag tree.
 All this is defined in a package `com.example.html` that is imported at the top of the builder example above.
 In the last section you can read through the full definition of this package.
 
-## Scope control: `@DslMarker`
+## Scope control: @DslMarker
 
 When using DSLs, one might have come across the problem that too many functions can be called in the context. 
-You can call methods of every available implicit receiver inside a lambda and therefore get an inconsistent result, 
+You can call methods of every available [implicit receiver](lambdas.md#function-literals-with-receiver) inside a lambda and therefore get an inconsistent result, 
 like the tag `head` inside another `head`: 
 
 ```kotlin
@@ -214,8 +214,9 @@ abstract class Tag(val name: String) { ... }
 
 You don't have to annotate the `HTML` or `Head` classes with `@HtmlTagMarker` because their superclass is already annotated:
 
-```
+```kotlin
 class HTML() : Tag("html") { ... }
+
 class Head() : Tag("head") { ... }
 ```
 
@@ -241,7 +242,72 @@ html {
 }
 ```
 
-## Full definition of the `com.example.html` package
+You can also apply the `@DslMarker` annotation directly to [function types](lambdas.md#function-types).
+Simply annotate the `@DslMarker` annotation with `@Target(AnnotationTarget.TYPE)`:
+
+```kotlin
+@Target(AnnotationTarget.TYPE)
+@DslMarker
+annotation class HtmlTagMarker
+```
+
+As a result, the `@DslMarker` annotation can be applied to function types, most commonly to lambdas with receivers. For example:
+
+```kotlin
+fun html(init: @HtmlTagMarker HTML.() -> Unit): HTML { ... }
+
+fun HTML.head(init: @HtmlTagMarker Head.() -> Unit): Head { ... }
+
+fun Head.title(init: @HtmlTagMarker Title.() -> Unit): Title { ... }
+```
+
+When you call these functions, the `@DslMarker` annotation restricts access to outer receivers in the body of a lambda marked with it unless you specify them explicitly:
+
+```kotlin
+html {
+    head {
+        title {
+            // Access to title, head or other functions of outer receivers is restricted here.
+        }
+    }
+}
+```
+
+Only the nearest receiver's members and extensions are accessible within a lambda, preventing unintended interactions between nested scopes.
+
+When both a member of an implicit receiver and a declaration from a [context parameter](context-parameters.md) are in a scope with the same name,
+the compiler reports a warning because the implicit receiver is shadowed by the context parameter.
+To resolve this, use a `this` qualifier to explicitly call the receiver, or use `contextOf<T>()` to call the context declaration:
+
+```kotlin
+interface HtmlTag {
+    fun setAttribute(name: String, value: String)
+}
+
+// Declares a top-level function with the same name,
+// which is available through a context parameter
+context(tag: HtmlTag)
+fun setAttribute(name: String, value: String) { tag.setAttribute(name, value) }
+
+fun test(head: HtmlTag, extraInfo: HtmlTag) {
+    with(head) {
+        // Introduces a context value of the same type in an inner scope
+        context(extraInfo) {
+            // Reports a warning:
+            // Uses an implicit receiver shadowed by a context parameter
+            setAttribute("user", "1234")
+
+            // Calls the receiver's member explicitly
+            this.setAttribute("user", "1234")
+
+            // Calls the context declaration explicitly
+            contextOf<HtmlTag>().setAttribute("user", "1234")
+        }
+    }
+}
+```
+
+### Full definition of the com.example.html package
 
 This is how the package `com.example.html` is defined (only the elements used in the example above).
 It builds an HTML tree. It makes heavy use of [extension functions](extensions.md) and
@@ -344,4 +410,3 @@ fun html(init: HTML.() -> Unit): HTML {
     return html
 }
 ```
-

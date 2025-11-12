@@ -1,9 +1,9 @@
 [//]: # (title: Work with collections in Spring Boot project)
 
-<microformat>
+<tldr>
     <p>This is a part of the <strong>Getting started with Spring Boot and Kotlin</strong> tutorial. Before proceeding, make sure you've completed previous steps:</p><br/>
     <p><a href="jvm-create-project-with-spring-boot.md">Create a Spring Boot project with Kotlin</a><br/><a href="jvm-spring-boot-add-data-class.md">Add a data class to Spring Boot project</a><br/><strong>Add database support for Spring Boot project</strong><br/></p>
-</microformat>
+</tldr>
 
 In this part, you will learn how to perform various operations on collections in Kotlin.
 While in many cases SQL can help with data operations such as filtering and sorting, in real-life applications, we often have to work with collections to manipulate data.
@@ -119,7 +119,7 @@ fun groups(): Map<String, List<Message>> {
 ## Transformation operations
 
 A common task with collections is to transform the collection elements from one type to another.
-Of course, Kotlin standard library provides a number of [transformation functions](https://kotlinlang.org/docs/collection-transformations.html) for such tasks.
+Of course, Kotlin standard library provides a number of [transformation functions](collection-transformations.md) for such tasks.
 
 For instance, let's transform a list of `Message` objects into a list of String objects which are composed by concatenating the `id` and the `text` body of the message.
 For that, we can use `map()` function that applies the given lambda function to each subsequent element and returns the list of the lambda results:

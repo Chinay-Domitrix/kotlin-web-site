@@ -26,22 +26,30 @@ val box = Box(1) // 1 has type Int, so the compiler figures out that it is Box<I
 One of the trickiest aspects of Java's type system is the wildcard types (see [Java Generics FAQ](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)).
 Kotlin doesn't have these. Instead, Kotlin has declaration-site variance and type projections.
 
-Let's think about why Java needs these mysterious wildcards. The problem is explained well in 
-[Effective Java, 3rd Edition](http://www.oracle.com/technetwork/java/effectivejava-136174.html), 
-Item 31: _Use bounded wildcards to increase API flexibility_.
-First, generic types in Java are _invariant_, meaning that `List<String>` is _not_ a subtype of `List<Object>`.
-If `List` were not _invariant_, it would have been no better than Java's arrays, as the following code would have 
-compiled but caused an exception at runtime:
+
+### Variance and wildcards in Java
+
+Let's think about why Java needs these mysterious wildcards. First, generic types in Java are _invariant_,
+meaning that `List<String>` is _not_ a subtype of `List<Object>`. If `List` were not _invariant_, it would
+have been no better than Java's arrays, as the following code would have compiled but caused an exception at runtime:
 
 ```java
 // Java
 List<String> strs = new ArrayList<String>();
-List<Object> objs = strs; // !!! A compile-time error here saves us from a runtime exception later.
-objs.add(1); // Put an Integer into a list of Strings
-String s = strs.get(0); // !!! ClassCastException: Cannot cast Integer to String
+
+// Java reports a type mismatch here at compile-time.
+List<Object> objs = strs;
+
+// What if it didn't?
+// We would be able to put an Integer into a list of Strings.
+objs.add(1);
+
+// And then at runtime, Java would throw
+// a ClassCastException: Integer cannot be cast to String
+String s = strs.get(0); 
 ```
 
-Java prohibits such things in order to guarantee run-time safety. But this has implications. For example,
+Java prohibits such things to guarantee runtime safety. But this has implications. For example,
 consider the `addAll()` method from the `Collection` interface. What's the signature of this method? Intuitively,
 you'd write it this way:
 
@@ -56,15 +64,13 @@ But then, you would not be able to do the following (which is perfectly safe):
 
 ```java
 // Java
+
+// The following would not compile with the naive declaration of addAll:
+// Collection<String> is not a subtype of Collection<Object>
 void copyAll(Collection<Object> to, Collection<String> from) {
     to.addAll(from);
-    // !!! Would not compile with the naive declaration of addAll:
-    // Collection<String> is not a subtype of Collection<Object>
 }
 ```
-
-(In Java, you probably learned this the hard way, see [Effective Java, 3rd Edition](http://www.oracle.com/technetwork/java/effectivejava-136174.html), 
-Item 28: _Prefer lists to arrays_)
 
 That's why the actual signature of `addAll()` is the following:
 
@@ -80,7 +86,7 @@ _or a subtype of_ `E`, not just `E` itself. This means that you can safely _read
 (elements of this collection are instances of a subclass of E), but _cannot write_ to
 it as you don't know what objects comply with that unknown subtype of `E`.
 In return for this limitation, you get the desired behavior: `Collection<String>` _is_ a subtype of `Collection<? extends Object>`.
-In other words, the wildcard with an _extends_\-bound (_upper_ bound) makes the type _covariant_.
+In other words, the wildcard with an _extends_-bound (_upper_ bound) makes the type _covariant_.
 
 The key to understanding why this works is rather simple: if you can only _take_ items from a collection,
 then using a collection of `String`s and reading `Object`s from it is fine. Conversely, if you can only _put_ items
@@ -91,22 +97,21 @@ The latter is called _contravariance_, and you can only call methods that take `
 (for example, you can call `add(String)` or `set(int, String)`).  If you call something that returns `T` in `List<T>`,
 you don't get a `String`, but rather an `Object`.
 
-Joshua Bloch gives the name _Producers_ to objects you only _read from_ and _Consumers_ to those you only _write to_. He recommends:
+Joshua Bloch, in his book [Effective Java, 3rd Edition](http://www.oracle.com/technetwork/java/effectivejava-136174.html), explains the problem well
+(Item 31: "Use bounded wildcards to increase API flexibility"). He gives the name _Producers_ to objects you only
+_read from_ and _Consumers_ to those you only _write to_. He recommends:
 
->"For maximum flexibility, use wildcard types on input parameters that represent producers or consumers",
-> and proposes the following mnemonic:
->
->_PECS stands for Producer-Extends, Consumer-Super._
->
-{type="tip"}
+>"For maximum flexibility, use wildcard types on input parameters that represent producers or consumers."
+
+He then proposes the following mnemonic: _PECS_ stands for _Producer-Extends, Consumer-Super._
 
 > If you use a producer-object, say, `List<? extends Foo>`, you are not allowed to call `add()` or `set()` on this object,
 > but this does not mean that it is _immutable_: for example, nothing prevents you from calling `clear()`
 > to remove all the items from the list, since `clear()` does not take any parameters at all.
 >
->The only thing guaranteed by wildcards (or other types of variance) is _type safety_. Immutability is a completely different story.
+> The only thing guaranteed by wildcards (or other types of variance) is _type safety_. Immutability is a completely different story.
 >
-{type="note"}
+{style="note"}
 
 ### Declaration-site variance
 
@@ -178,7 +183,7 @@ fun demo(x: Comparable<Number>) {
 The words _in_ and _out_ seem to be self-explanatory (as they've already been used successfully in C# for quite some time),
 and so the mnemonic mentioned above is not really needed.  It can in fact be rephrased at a higher level of abstraction:
 
-**[The Existential](https://en.wikipedia.org/wiki/Existentialism) Transformation: Consumer in, Producer out\!** :-)
+**[The Existential](https://en.wikipedia.org/wiki/Existentialism) Transformation: Consumer in, Producer out!** :-)
 
 ## Type projections
 
@@ -234,8 +239,8 @@ You can project a type with `in` as well:
 fun fill(dest: Array<in String>, value: String) { ... }
 ```
 
-`Array<in String>` corresponds to Java's `Array<? super String>`. This means that you can pass an array of `CharSequence`
-or an array of `Object` to the `fill()` function.
+`Array<in String>` corresponds to Java's `Array<? super String>`. This means that you can pass an array of `String`, `CharSequence`,
+or `Object` to the `fill()` function.
 
 ### Star-projections
 
@@ -261,7 +266,7 @@ For example, if the type is declared as `interface Function<in T, out U>` you co
 
 > Star-projections are very much like Java's raw types, but safe.
 >
-{type="note"}
+{style="note"}
 
 ## Generic functions
 
@@ -309,7 +314,7 @@ sort(listOf(HashMap<Int, String>())) // Error: HashMap<Int, String> is not a sub
 ```
 
 The default upper bound (if there was none specified) is `Any?`. Only one upper bound can be specified inside the angle brackets.
-If the same type parameter needs more than one upper bound, you need a separate _where_\-clause:
+If the same type parameter needs more than one upper bound, you need a separate _where_-clause:
 
 ```kotlin
 fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
@@ -469,7 +474,7 @@ inline fun <reified T> List<*>.asListOfType(): List<T>? =
 >nullability and actual type arguments of the element type are still erased. For example,
 >the cast `foo as Array<List<String>?>` will succeed if `foo` is an array holding any `List<*>`, whether it is nullable or not.
 >
-{type="note"}
+{style="note"}
 
 ## Underscore operator for type arguments
 

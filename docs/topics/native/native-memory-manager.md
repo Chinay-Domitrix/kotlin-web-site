@@ -4,25 +4,30 @@ Kotlin/Native uses a modern memory manager that is similar to the JVM, Go, and o
 the following features:
 
 * Objects are stored in a shared heap and can be accessed from any thread.
-* Tracing garbage collection (GC) is performed periodically to collect objects that are not reachable from the "roots",
+* Tracing garbage collection is performed periodically to collect objects that are not reachable from the "roots",
   like local and global variables.
 
 ## Garbage collector
 
-Kotlin/Native's GC algorithm is constantly evolving. Currently, it functions as a stop-the-world mark and concurrent sweep
-collector that does not separate the heap into generations.
+Kotlin/Native's garbage collector (GC) algorithm is constantly evolving. Currently, it functions as a stop-the-world mark
+and concurrent sweep collector that does not separate the heap into generations.
 
-The GC uses a full parallel mark that combines paused mutators, the GC thread, and optional marker threads to process
-the mark queue. By default, paused mutators and at least one GC thread participate in the marking process.
-You can disable the full parallel mark with the `-Xbinary=gcMarkSingleThreaded=true` compilation option.
-However, this may increase the pause time of the garbage collector.
+The GC is executed on a separate thread and started based on the memory pressure heuristics or by a timer. Alternatively,
+it can be [called manually](#enable-garbage-collection-manually).
+
+The GC processes the mark queue on several threads in parallel, including application threads, the GC thread,
+and optional marker threads. Application threads and at least one GC thread participate in the marking process.
+By default, application threads must be paused when the GC is marking objects in the heap.
+
+> You can disable the parallelization of the mark phase with the `kotlin.native.binary.gcMarkSingleThreaded=true` compiler option.
+> However, this may increase the garbage collector's pause time on large heaps.
+>
+{style="tip"}
 
 When the marking phase is completed, the GC processes weak references and nullifies reference points to an unmarked object.
-To decrease the GC pause time, you can enable the concurrent processing of weak references by using
-the `-Xbinary=concurrentWeakSweep=true` compilation option.
+By default, weak references are processed concurrently to decrease the GC pause time.
 
-The GC is executed on a separate thread and started based on the timer
-and memory pressure heuristics. Alternatively, it can be [called manually](#enable-garbage-collection-manually).
+See how to [monitor](#monitor-gc-performance) and [optimize](#optimize-gc-performance) garbage collection.
 
 ### Enable garbage collection manually
 
@@ -31,8 +36,8 @@ and waits for its completion.
 
 ### Monitor GC performance
 
-No special instruments are currently available to monitor the GC performance. However, it's possible to look through GC
-logs to diagnose issues. To enable logging, set the following compilation flag in the Gradle build script:
+To monitor the GC performance, you can look through its logs and diagnose issues. To enable logging,
+set the following compiler option in your Gradle build script:
 
 ```none
 -Xruntime-logs=gc=info
@@ -40,20 +45,53 @@ logs to diagnose issues. To enable logging, set the following compilation flag i
 
 Currently, the logs are only printed to `stderr`.
 
+On Apple platforms, you can take advantage of the Xcode Instruments toolkit to debug iOS app performance.
+The garbage collector reports pauses with signposts available in Instruments.
+Signposts enable custom logging within your app, allowing you to check if a GC pause corresponds to an application freeze.
+
+To track GC-related pauses in your app:
+
+1. To enable the feature, set the following compiler option in your `gradle.properties` file:
+  
+   ```none
+   kotlin.native.binary.enableSafepointSignposts=true
+   ```
+
+2. Open Xcode, go to **Product** | **Profile** or press <shortcut>Cmd + I</shortcut>. This action compiles your app and
+   launches Instruments.
+3. In the template selection, select **os_signpost**.
+4. Configure it by specifying `org.kotlinlang.native.runtime` as **subsystem** and `safepoint` as **category**.
+5. Click the red record button to run your app and start recording signpost events:
+
+   ![Tracking GC pauses as signposts](native-gc-signposts.png){width=700}
+
+   Here, each blue blob on the lowest graph represents a separate signpost event, which is a GC pause.
+
+### Optimize GC performance
+
+To improve GC performance, you can enable concurrent marking to decrease the GC pause time. This allows the marking phase of garbage collection to run simultaneously with application threads.
+
+The feature is currently [Experimental](components-stability.md#stability-levels-explained). To enable it, set the
+following compiler option in your `gradle.properties` file:
+  
+```none
+kotlin.native.binary.gc=cms
+```
+
 ### Disable garbage collection
 
-It's recommended to keep GC enabled. However, you can disable it in certain cases, such as for testing purposes or
-if you encounter issues and have a short-lived program. To do so, set the following compilation flag in the Gradle
-build script:
+It's recommended to keep the GC enabled. However, you can disable it in certain cases, such as for testing purposes or
+if you encounter issues and have a short-lived program. To do so, set the following binary option in your
+`gradle.properties` file:
 
 ```none
--Xgc=noop
+kotlin.native.binary.gc=noop
 ```
 
 > With this option enabled, the GC doesn't collect Kotlin objects, so memory consumption will keep rising as long as the
 > program runs. Be careful not to exhaust the system memory.
 >
-{type="warning"}
+{style="warning"}
 
 ## Memory consumption
 
@@ -73,7 +111,12 @@ making the memory usage grow endlessly. In this case, the GC forces a stop-the-w
 
 You can monitor memory consumption yourself, check for memory leaks, and adjust memory consumption.
 
-### Check for memory leaks
+### Monitor memory consumption
+
+To debug memory issues, you can check memory manager metrics. In addition, it's possible to track Kotlin's memory
+consumption on Apple platforms.
+
+#### Check for memory leaks
 
 To access the memory manager metrics, call `kotlin.native.internal.GC.lastGCInfo()`. This method returns statistics for the last
 run of the garbage collector. The statistics can be useful for:
@@ -111,29 +154,82 @@ fun test() {
 }
 ```
 
+#### Track memory consumption on Apple platforms
+
+When debugging memory issues on Apple platforms, you can see how much memory is reserved by Kotlin code.
+Kotlin's share is tagged with an identifier and can be tracked through tools like VM Tracker in Xcode Instruments.
+
+The feature is available only for the default Kotlin/Native memory allocator when _all_ the following conditions are met:
+
+* **Tagging enabled**. The memory should be tagged with a valid identifier. Apple recommends numbers between 240 and 255;
+  the default value is 246.
+
+  If you set up the `kotlin.native.binary.mmapTag=0` Gradle property, tagging is disabled.
+
+* **Allocation with mmap**. The allocator should use the `mmap` system call to map files into memory.
+
+  If you set up the `kotlin.native.binary.disableMmap=true` Gradle property, the default allocator uses `malloc` instead
+  of `mmap`.
+
+* **Paging enabled**. Paging of allocations (buffering) should be enabled.
+
+  If you set up the [`kotlin.native.binary.pagedAllocator=false`](#disable-allocator-paging) Gradle property, the memory is
+  reserved on a per-object basis instead.
+
 ### Adjust memory consumption
 
-If there are no memory leaks in the program, but you still see unexpectedly high memory consumption,
-try updating Kotlin to the latest version. We're constantly improving the memory manager, so even a simple compiler
+If you experience unexpectedly high memory consumption, try the following solutions:
+
+#### Update Kotlin
+
+Update Kotlin to the latest version. We're constantly improving the memory manager, so even a simple compiler
 update might improve memory consumption.
 
-If you continue to experience high memory consumption after updating, several options are available:
+#### Disable allocator paging 
+<primary-label ref="experimental-opt-in"/>
 
-* Switch to a different memory allocator by using one of the following compilation options in your Gradle build script:
+You can disable paging of allocations (buffering) so that the memory allocator reserves memory on a per-object basis.
+In some cases, it may help you satisfy strict memory limitations or reduce memory consumption on the application's startup.
 
-  * `-Xallocator=mimalloc` for the [mimalloc](https://github.com/microsoft/mimalloc) allocator.
-  * `-Xallocator=std` for the system allocator.
+To do that, set the following option in your `gradle.properties` file:
 
-* If you use the mimalloc allocator, you can instruct it to promptly release memory back to the system.
-  To do so, enable the following binary option in your `gradle.properties` file:
+```none
+kotlin.native.binary.pagedAllocator=false
+```
 
-  ```none
-  kotlin.native.binary.mimallocUseCompaction=true
-  ```
+> With allocator paging disabled, [tracking memory consumption on Apple platforms](#track-memory-consumption-on-apple-platforms)
+> is not possible.
+> 
+{style="note"}
 
-  It's a smaller performance cost, but it yields less certain results than the standard system allocator does.
+#### Enable support for Latin-1 strings
+<primary-label ref="experimental-opt-in"/>
 
-If none of these options improves your memory consumption, report an issue in [YouTrack](https://youtrack.jetbrains.com/newissue?project=kt).
+By default, strings in Kotlin are stored using UTF-16 encoding, where each character is represented by two bytes.
+In some cases, it leads to strings taking up twice as much space in the binary compared to the source code
+and reading data taking up twice as much memory.
+
+To reduce the application's binary size and adjust memory consumption, you can enable support for Latin-1-encoded strings.
+The [Latin-1 (ISO 8859-1)](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) encoding represents each of the first 256
+Unicode characters by just one byte.
+
+To enable it, set the following option in your `gradle.properties` file:
+
+```none
+kotlin.native.binary.latin1Strings=true
+```
+
+With the Latin-1 support, strings are stored in Latin-1 encoding as long as all the characters fall within its range.
+Otherwise, the default UTF-16 encoding is used.
+
+> While the feature is Experimental, the cinterop extension functions [`String.pin`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlinx.cinterop/pin.html),
+> [`String.usePinned`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlinx.cinterop/use-pinned.html), and
+> [`String.refTo`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlinx.cinterop/ref-to.html) become less efficient.
+> Each call to them may trigger an automatic string conversion to UTF-16.
+> 
+{style="note"}
+
+If none of these options helped, create an issue in [YouTrack](https://kotl.in/issue).
 
 ## Unit tests in the background
 
@@ -161,11 +257,11 @@ fun mainBackground(args: Array<String>) {
     error("CFRunLoopRun should never return")
 }
 ```
-{initial-collapse-state="collapsed"}
+{initial-collapse-state="collapsed" collapsible="true"}
 
-Then, compile the test binary with the `-e testlauncher.mainBackground` compiler flag.
+Then, compile the test binary with the `-e testlauncher.mainBackground` compiler option.
 
 ## What's next
 
 * [Migrate from the legacy memory manager](native-migration-guide.md)
-* [Configure integration with iOS](native-ios-integration.md)
+* [Check the specifics of integration with Swift/Objective-C ARC](native-arc-integration.md)

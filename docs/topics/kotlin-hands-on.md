@@ -17,7 +17,7 @@ Create a React Application using Kotlin/JS, and see how you can leverage Kotlin'
 
 ## Building web applications with Spring Boot and Kotlin
 
-Build a sample blog application by combining the power of Spring Boot and Kotlin.
+Build a simple blog application by combining the power of Spring Boot and Kotlin.
 
 [**Start**](https://spring.io/guides/tutorials/spring-boot-kotlin/)
 
@@ -55,10 +55,10 @@ Create a simple HTTP client that can run natively on multiple platforms using Ko
 
 Learn how to create a mobile application for Android and iOS using Kotlin Multiplatform with Ktor and SQLDelight.
 
-[**Start**](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-ktor-sqldelight.html)
+[**Start**](https://kotlinlang.org/docs/multiplatform/multiplatform-ktor-sqldelight.html)
 
 ## Targeting iOS and Android with Kotlin Multiplatform
 
 Learn how to create a mobile application that can target both iOS and Android using Kotlin Multiplatform.
 
-[**Start**](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-create-first-app.html)
+[**Start**](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html)

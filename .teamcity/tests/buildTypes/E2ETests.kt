@@ -1,57 +1,81 @@
 package tests.buildTypes
 
+import documentation.builds.KotlinWithCoroutines
 import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
-import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
-import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
+import jetbrains.buildServer.configs.kotlin.FailureAction
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.triggers.vcs
+import kotlinlang.builds.BuildJsAssets
+import references.builds.kotlinx.coroutines.KotlinxCoroutinesBuildApiReference
+import references.builds.kotlinx.serialization.KotlinxSerializationBuildApiReference
 
 
 object E2ETests : BuildType({
-  name = "E2E tests"
+    name = "E2E tests"
 
-  vcs {
-    root(vcsRoots.KotlinLangOrg)
-  }
-
-  steps {
-    script {
-      scriptContent = "./scripts/test/up.sh"
+    vcs {
+        root(vcsRoots.KotlinLangOrg)
     }
 
-    script {
-      scriptContent = "./scripts/test/run.sh"
-    }
-
-    script {
-      scriptContent = "./scripts/test/stop.sh"
-    }
-  }
-
-  requirements {
-    exists("docker.server.version")
-    contains("docker.server.osType", "linux")
-  }
-
-  features {
-    /*commitStatusPublisher {
-      vcsRootExtId = "${vcsRoots.KotlinLangOrg.id}"
-      publisher = github {
-        githubUrl = "https://api.github.com"
-        authType = personalToken {
-          token = "%github.oauth%"
+    dependencies {
+        artifacts(KotlinWithCoroutines) {
+            cleanDestination = true
+            artifactRules = """
+                +:webHelpImages.zip!** => dist/docs/images/
+                +:webHelpKR2.zip!** => dist/docs/
+            """.trimIndent()
         }
-      }
-    }*/
-    pullRequests {
-      vcsRootExtId = "${vcsRoots.KotlinLangOrg.id}"
-      provider = github {
-        authType = token {
-          token = "%github.oauth%"
+
+        dependency(BuildJsAssets) {
+            snapshot {
+                onDependencyFailure = FailureAction.FAIL_TO_START
+                onDependencyCancel = FailureAction.CANCEL
+            }
+
+            artifacts {
+                artifactRules = "+:assets.zip!** => _assets/"
+            }
         }
-        filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER_OR_COLLABORATOR
-      }
+
+        dependency(KotlinxCoroutinesBuildApiReference) {
+            snapshot {
+                onDependencyFailure = FailureAction.CANCEL
+                onDependencyCancel = FailureAction.CANCEL
+            }
+
+            artifacts {
+                artifactRules = "+:pages.zip!** => libs/kotlinx.coroutines/"
+            }
+        }
+
+        dependency(KotlinxSerializationBuildApiReference) {
+            snapshot {
+                onDependencyFailure = FailureAction.CANCEL
+                onDependencyCancel = FailureAction.CANCEL
+            }
+
+            artifacts {
+                artifactRules = "+:pages.zip!** => libs/kotlinx.serialization/"
+            }
+        }
     }
-  }
+
+    steps {
+        script {
+            name = "Set execute permissions"
+            scriptContent = "chmod +x ./scripts/test/run-e2e-tests.sh"
+        }
+        script {
+            name = "Run E2E tests"
+            scriptContent = "./scripts/test/run-e2e-tests.sh"
+        }
+    }
+
+    artifactRules = """
+        +:test-results/ => test-results/
+    """.trimIndent()
+
+    requirements {
+        exists("docker.server.version")
+        contains("docker.server.osType", "linux")
+    }
 })

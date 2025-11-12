@@ -40,10 +40,10 @@ fun powerOf(
 ) { /*...*/ }
 ```
 
-### Default arguments
+### Parameters with default values
 
-Function parameters can have default values, which are used when you skip the corresponding argument. This reduces the number
-of overloads:
+Function parameters can have default values, which are used when you skip the corresponding argument.
+This reduces the number of overloads:
 
 ```kotlin
 fun read(
@@ -52,6 +52,8 @@ fun read(
     len: Int = b.size,
 ) { /*...*/ }
 ```
+
+Such parameters are also referred to as _optional parameters_.
 
 A default value is set by appending `=` to the type.
 
@@ -68,7 +70,7 @@ class B : A() {
 }
 ```
 
-If a default parameter precedes a parameter with no default value, the default value can only be used by calling
+If a parameter with default value precedes a parameter with no default value, the default value can only be used by calling
 the function with [named arguments](#named-arguments):
 
 ```kotlin
@@ -80,8 +82,8 @@ fun foo(
 foo(baz = 1) // The default value bar = 0 is used
 ```
 
-If the last argument after default parameters is a [lambda](lambdas.md#lambda-expression-syntax),
-you can pass it either as a named argument or [outside the parentheses](lambdas.md#passing-trailing-lambdas):
+If the last parameter after all parameters with default values has a functional type,
+then you can pass the corresponding [lambda](lambdas.md#lambda-expression-syntax) argument either as a named argument or [outside the parentheses](lambdas.md#passing-trailing-lambdas):
 
 ```kotlin
 fun foo(
@@ -141,7 +143,7 @@ reformat("This is a short String!", upperCaseFirstLetter = false, wordSeparator 
 ```
 
 You can pass a [variable number of arguments (`vararg`)](#variable-number-of-arguments-varargs) with names using the
-`spread` operator:
+_spread_ operator (prefix the array with `*`):
 
 ```kotlin
 fun foo(vararg strings: String) { /*...*/ }
@@ -152,7 +154,7 @@ foo(strings = *arrayOf("a", "b", "c"))
 > When calling Java functions on the JVM, you can't use the named argument syntax because Java bytecode does not
 > always preserve the names of function parameters.
 >
-{type="note"}
+{style="note"}
 
 ### Unit-returning functions
 
@@ -220,11 +222,11 @@ Inside a function, a `vararg`-parameter of type `T` is visible as an array of `T
 variable has type `Array<out T>`.
 
 Only one parameter can be marked as `vararg`. If a `vararg` parameter is not the last one in the list, values for the
-subsequent parameters can be passed using named argument syntax, or, if the parameter has a function type, by passing
+subsequent parameters must be passed using named argument syntax, or, if the parameter has a function type, by passing
 a lambda outside the parentheses.
 
 When you call a `vararg`-function, you can pass arguments individually, for example `asList(1, 2, 3)`. If you already have
-an array and want to pass its contents to the function, use the *spread* operator (prefix the array with `*`):
+an array and want to pass its contents to the function, use the spread operator (prefix the array with `*`):
 
 ```kotlin
 val a = arrayOf(1, 2, 3)
@@ -247,7 +249,7 @@ for the call). Infix functions must meet the following requirements:
 * They must be member functions or [extension functions](extensions.md).
 * They must have a single parameter.
 * The parameter must not [accept variable number of arguments](#variable-number-of-arguments-varargs) and must have
-no [default value](#default-arguments).
+no [default value](#parameters-with-default-values).
 
 ```kotlin
 infix fun Int.shl(x: Int): Int { ... }
@@ -270,7 +272,7 @@ infix fun Int.shl(x: Int): Int { ... }
 > * `a && b xor c` is equivalent to `a && (b xor c)`
 > * `a xor b in c` is equivalent to `(a xor b) in c`
 >
-{type="note"}
+{style="note"}
 
 Note that infix functions always require both the receiver and the parameter to be specified. When you're
 calling a method on the current receiver using the infix notation, use `this` explicitly. This is required to ensure

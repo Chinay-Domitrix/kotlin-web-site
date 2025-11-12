@@ -1,14 +1,13 @@
 package tests.buildTypes
 
-import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildApiReference
-import builds.apiReferences.kotlinx.serialization.KotlinxSerializationBuildApiReference
 import jetbrains.buildServer.configs.kotlin.BuildStep
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.FailureAction
 import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.triggers.vcs
+import references.builds.kotlinx.coroutines.KotlinxCoroutinesBuildApiReference
+import references.builds.kotlinx.serialization.KotlinxSerializationBuildApiReference
 
 object ApiReferencesTemplateTest: BuildType({
   name = "Api References Template Test"
@@ -23,7 +22,7 @@ object ApiReferencesTemplateTest: BuildType({
         yarn install --frozen-lockfile
         yarn build:production
       """.trimIndent()
-      dockerImage = "node:16-alpine"
+      dockerImage = "node:18-alpine"
     }
     script {
       scriptContent = "./scripts/dokka/up.sh"
@@ -39,7 +38,7 @@ object ApiReferencesTemplateTest: BuildType({
 
   requirements {
     exists("docker.server.version")
-    contains("docker.server.osType", "linux")
+    doesNotContain("docker.server.osType", "windows")
   }
 
   features {

@@ -10,7 +10,7 @@ the surrounding tooling.
 
 ## Inline JavaScript
 
-You can inline some JavaScript code into your Kotlin code using the [`js()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.js/js.html) function.
+You can inline JavaScript code into your Kotlin code using the [`js()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.js/js.html) function.
 For example:
 
 ```kotlin
@@ -26,11 +26,16 @@ a string constant. So, the following code is incorrect:
 fun jsTypeOf(o: Any): String {
     return js(getTypeof() + " o") // error reported here
 }
+
 fun getTypeof() = "typeof"
 ```
 
-Note that invoking `js()` returns a result of type [`dynamic`](dynamic-type.md), which provides no type safety at the
-compile time.
+> As the JavaScript code is parsed by the Kotlin compiler, not all ECMAScript features might be supported.
+> In this case, you can encounter compilation errors.
+> 
+{style="note"}
+
+Note that invoking `js()` returns a result of type [`dynamic`](dynamic-type.md), which provides no type safety at compile time.
 
 ## external modifier
 
@@ -87,9 +92,9 @@ external class MyClass {
 }
 ```
 
-### Declare optional parameters
+### Declare parameters with default values
 
-If you are writing an external declaration for a JavaScript function which has an optional parameter, use `definedExternally`.
+If you are writing an external declaration for a JavaScript function which has a parameter with a default value, use `definedExternally`.
 This delegates the generation of the default values to the JavaScript function itself:
 
 ```kotlin
@@ -114,7 +119,7 @@ open external class Foo {
     fun stop()
 }
 
-class Bar: Foo() {
+class Bar : Foo() {
     override fun run() {
         window.alert("Running!")
     }
@@ -128,7 +133,7 @@ class Bar: Foo() {
 There are some limitations:
 
 - When a function of an external base class is overloaded by signature, you can't override it in a derived class.
-- You can't override a function with default arguments.
+- You can't override a function including parameters with default values.
 - Non-external classes can't be extended by external classes.
 
 ### external interfaces
@@ -211,3 +216,40 @@ function usingAsOperator(s) {
     return typeof (tmp$ = s) === 'string' ? tmp$ : throwCCE();
 }
 ```
+
+## Equality
+
+Kotlin/JS has particular semantics for equality checks compared to other platforms. 
+
+In Kotlin/JS, the Kotlin [referential equality](equality.md#referential-equality) operator (`===`) always translates to the JavaScript
+[strict equality](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality) operator (`===`). 
+
+The JavaScript `===` operator checks not only that two values are equal but also that
+the types of these two values are equal:
+
+ ```kotlin
+fun main() {
+    val name = "kotlin"
+    val value1 = name.substring(0, 1)
+    val value2 = name.substring(0, 1)
+
+    println(if (value1 === value2) "yes" else "no")
+    // Prints 'yes' on Kotlin/JS
+    // Prints 'no' on other platforms
+}
+ ```
+
+Also, in Kotlin/JS, the [`Byte`, `Short`, `Int`, `Float`, and `Double`](js-to-kotlin-interop.md#kotlin-types-in-javascript) numeric types 
+are all represented with the `Number` JavaScript type in runtime. Therefore, the values of these five types are indistinguishable:
+
+ ```kotlin
+fun main() {
+    println(1.0 as Any === 1 as Any)
+    // Prints 'true' on Kotlin/JS
+    // Prints 'false' on other platforms
+}
+ ```
+
+> For more information about equality in Kotlin, see the [Equality](equality.md) documentation.
+> 
+{style="tip"}

@@ -2,10 +2,12 @@
 
 Kotlin/JS projects use Gradle as a build system. To let developers easily manage their Kotlin/JS projects, we offer
 the `kotlin.multiplatform` Gradle plugin that provides project configuration tools together with helper tasks for automating routines
-typical for JavaScript development. For example, the plugin downloads the [Yarn](https://yarnpkg.com/) package manager
-for managing [npm](https://www.npmjs.com/) dependencies in background and can build a JavaScript bundle from a Kotlin project
-using [webpack](https://webpack.js.org/). Dependency management and configuration adjustments can be done to a large part
-directly from the Gradle build file, with the option to override automatically generated configurations for full control.
+typical for JavaScript development.
+
+The plugin downloads npm dependencies in the background using the [npm](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com/)
+package managers and builds a JavaScript bundle from a Kotlin project using [webpack](https://webpack.js.org/).
+Dependency management and configuration adjustments can be done to a large part directly from the Gradle build file,
+with the option to override automatically generated configurations for full control.
 
 You can apply the `org.jetbrains.kotlin.multiplatform` plugin to a Gradle project manually in the `build.gradle(.kts)` file:
 
@@ -34,13 +36,16 @@ The Kotlin Multiplatform Gradle plugin lets you manage aspects of your project i
 
 ```groovy
 kotlin {
-    //...
+    // ...
 }
 ```
 
 Inside the `kotlin {}` block, you can manage the following aspects:
 
 * [Target execution environment](#execution-environments): browser or Node.js 
+* [Support for ES2015 features](#support-for-es2015-features): classes, modules, and generators
+* [Configure output granularity](#configure-output-granularity)
+* [Generation of TypeScript declaration files](#generation-of-typescript-declaration-files-d-ts)
 * [Project dependencies](#dependencies): Maven and npm
 * [Run configuration](#run-task)
 * [Test configuration](#test-task)
@@ -69,20 +74,95 @@ kotlin {
 ```
 
 The instruction `binaries.executable()` explicitly instructs the Kotlin compiler to emit executable `.js` files.
-This is the default behavior when using the current Kotlin/JS compiler, but the instruction is explicitly required if you
-are working with the [Kotlin/JS IR compiler](js-ir-compiler.md), or have set `kotlin.js.generate.executable.default=false`
-in the `gradle.properties` file. In those cases, omitting `binaries.executable()` will cause the compiler to only generate 
+Omitting `binaries.executable()` will cause the compiler to only generate 
 Kotlin-internal library files, which can be used from other projects, but not run on their own.
 
 > This is typically faster than creating executable files,
 > and can be a possible optimization when dealing with non-leaf modules of your project.
 >
-{type="tip"}
+{style="tip"}
 
 The Kotlin Multiplatform plugin automatically configures its tasks for working with the selected environment.
 This includes downloading and installing the required environment and dependencies for running and testing the application.
 This allows developers to build, run, and test simple projects without additional configuration. For projects targeting
 Node.js, there is also an option to use an existing Node.js installation. Learn how to [use pre-installed Node.js](#use-pre-installed-node-js).
+
+## Support for ES2015 features
+
+Kotlin provides an [Experimental](components-stability.md#stability-levels-explained) support for the following ES2015
+features:
+
+* Modules that simplify your codebase and improve maintainability.
+* Classes that allow incorporating OOP principles, resulting in cleaner and more intuitive code.
+* Generators for compiling [suspend functions](https://kotlinlang.org/docs/composing-suspending-functions.html) that improve the final bundle size
+  and help with debugging.
+
+You can enable all the supported ES2015 features at once by adding the `es2015` compilation target to your
+`build.gradle(.kts)` file:
+
+```kotlin
+tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions {
+        target = "es2015"
+    }
+}
+```
+
+[Learn more about ES2015 (ECMAScript 2015, ES6) in the official documentation](https://262.ecma-international.org/6.0/).
+
+## Configure output granularity
+
+You can choose how the compiler outputs `.js` files in your project:
+
+* **One per module**. By default, the JS compiler outputs separate `.js` files for each project module as a
+  compilation result.
+* **One per project**. You can compile the whole project into a single `.js` file by adding the following line to the
+  `gradle.properties` file:
+
+  ```none
+  kotlin.js.ir.output.granularity=whole-program // 'per-module' is the default
+  ```
+
+* **One per file**. You can set up a more granular output that generates one (or two, if the file contains exported
+  declarations) JavaScript file per each Kotlin file. To enable the per-file compilation mode:
+  1. Set `es2015` as the [compilation target](#support-for-es2015-features)
+     to support ES2015 features in your project.
+  2. Add the following line to the `gradle.properties` file:
+     ```none
+     kotlin.js.ir.output.granularity=per-file // 'per-module' is the default
+     ```
+
+## Generation of TypeScript declaration files (`d.ts`)
+<primary-label ref="experimental-opt-in"/>
+
+The Kotlin/JS compiler can generate TypeScript definitions from your Kotlin code. These definitions can be
+used by JavaScript tools and IDEs when working on hybrid applications to:
+
+* Provide autocompletion
+* Support static analyzers
+* Simplify the addition of Kotlin code in JavaScript and TypeScript projects
+
+Generating TypeScript definitions is especially valuable for the [business logic sharing use cases](js-overview.md#use-cases-for-kotlin-js).
+
+The compiler collects any top-level declarations marked with [`@JsExport`](js-to-kotlin-interop.md#jsexport-annotation) and automatically
+generates TypeScript definitions in a `.d.ts` file.
+
+To generate TypeScript definitions, explicitly configure it in your Gradle build file.
+Add the `generateTypeScriptDefinitions()` function to your `build.gradle.kts` file in the [`js {}` block](js-project-setup.md#execution-environments):
+
+```kotlin
+kotlin {
+    js {
+        binaries.executable()
+        browser {
+        }
+        generateTypeScriptDefinitions()
+    }
+}
+```
+
+You can find the definitions in the `build/js/packages/<package_name>/kotlin` directory alongside the corresponding
+un-webpacked JavaScript code.
 
 ## Dependencies
 
@@ -119,7 +199,7 @@ of the build script:
 ```kotlin
 kotlin {
     sourceSets {
-      val jsMain by getting {
+        val jsMain by getting {
             dependencies {
                 implementation("org.example.myproject:1.1.0")
             }
@@ -149,7 +229,7 @@ kotlin {
 > Not all libraries available for the Kotlin programming language are available when targeting JavaScript:
 > only libraries that include artifacts for Kotlin/JS can be used.
 >
-{type="note"}
+{style="note"}
 
 If the library you are adding has dependencies on [packages from npm](#npm-dependencies), Gradle will automatically resolve
 these transitive dependencies as well.
@@ -159,10 +239,8 @@ these transitive dependencies as well.
 The dependencies on the [standard library](https://kotlinlang.org/api/latest/jvm/stdlib/index.html)
 are added automatically. The version of the standard library is the same as the version of the Kotlin Multiplatform plugin.
 
-The [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API is available for multiplatform tests.
-When you create a multiplatform project, the Project Wizard automatically adds test dependencies to all the source sets.
-
-If you don't use the Project Wizard to create your project, you can add the dependencies manually:
+For multiplatform tests, the [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API is available. When you
+create a multiplatform project, you can add test dependencies to all the source sets by using a single dependency in `commonTest`:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -170,10 +248,8 @@ If you don't use the Project Wizard to create your project, you can add the depe
 ```kotlin
 kotlin {
     sourceSets {
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test")) // Brings all the platform dependencies automatically
-            }
+        commonTest.dependencies {
+            implementation(kotlin("test")) // Brings all the platform dependencies automatically
         }
     }
 }
@@ -206,7 +282,7 @@ The Kotlin Multiplatform Gradle plugin lets you declare npm dependencies in the 
 declare any other dependencies.
 
 To declare an npm dependency, pass its name and version to the `npm()` function inside a dependency declaration.
-You can also specify one or multiple version ranges based on [npm's semver syntax](https://docs.npmjs.com/misc/semver#versions).
+You can also specify one or multiple version ranges based on [npm's semver syntax](https://docs.npmjs.com/about-semantic-versioning).
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -229,9 +305,15 @@ dependencies {
 </tab>
 </tabs>
 
-The plugin uses the [Yarn](https://yarnpkg.com/lang/en/) package manager to download and install npm dependencies.
-It works out of the box without additional configuration, but you can tune it to specific needs.
-Learn how to [configure Yarn in Kotlin Multiplatform Gradle plugin](#yarn).
+By default, the plugin uses a separate instance of the [Yarn](https://yarnpkg.com/lang/en/) package manager to download
+and install npm dependencies. It works out of the box without additional configuration, but you can [tune it to specific needs](#yarn).
+
+You can also work with npm dependencies directly using the [npm](https://www.npmjs.com/) package manager instead.
+To use npm as your package manager, in your `gradle.properties` file, set the following property:
+
+```none
+kotlin.js.yarn=false
+```
 
 Besides regular dependencies, there are three more types of dependencies that can be used from the Gradle DSL.
 To learn more about when each type of dependency can best be used, have a look at the official documentation linked from npm:
@@ -244,7 +326,7 @@ Once an npm dependency is installed, you can use its API in your code as describ
 
 ## run task
 
-The Kotlin/JS plugin provides a `jsRun` task that lets you run pure Kotlin/JS projects without additional configuration.
+The Kotlin Multiplatform Gradle plugin provides a `jsBrowserDevelopmentRun` task that lets you run pure Kotlin/JS projects without additional configuration.
 
 For running Kotlin/JS projects in the browser, this task is an alias for the `browserDevelopmentRun` task (which is also
 available in Kotlin multiplatform projects). It uses the [webpack-dev-server](https://webpack.js.org/configuration/dev-server/)
@@ -252,25 +334,25 @@ to serve your JavaScript artifacts.
 If you want to customize the configuration used by `webpack-dev-server`, for example, adjust the port the server runs on,
 use the [webpack configuration file](#webpack-bundling).
 
-For running Kotlin/JS projects targeting Node.js, use the `jsRun` task that is an alias for the `nodeRun` task.
+For running Kotlin/JS projects targeting Node.js, use the `jsNodeDevelopmentRun` task that is an alias for the `nodeRun` task.
 
-To run a project, execute the standard lifecycle `jsRun` task, or the alias to which it corresponds:
+To run a project, execute the standard lifecycle `jsBrowserDevelopmentRun` task, or the alias to which it corresponds:
 
 ```bash
-./gradlew jsRun
+./gradlew jsBrowserDevelopmentRun
 ```
 
 To automatically trigger a re-build of your application after making changes to the source files, use the Gradle
 [continuous build](https://docs.gradle.org/current/userguide/command_line_interface.html#sec:continuous_build) feature:
 
 ```bash
-./gradlew jsRun --continuous
+./gradlew jsBrowserDevelopmentRun --continuous
 ```
 
 or 
 
 ```bash
-./gradlew jsRun -t
+./gradlew jsBrowserDevelopmentRun -t
 ```
 
 Once the build of your project has succeeded, the `webpack-dev-server` will automatically refresh the browser page.
@@ -347,9 +429,9 @@ To run tests, execute the standard lifecycle `check` task:
 ```bash
 ./gradlew check
 ```
-         
+
 To specify environment variables used by your Node.js test runners (for example, to pass external information to your tests, or to fine-tune package resolution), use the `environment()` function with a key-value pair inside the `testTask {}` block in your build script:
-         
+
 ```groovy
 kotlin {
     js {
@@ -359,7 +441,7 @@ kotlin {
             }
         }
     }
-}        
+}
 ```
 
 ### Karma configuration
@@ -375,7 +457,7 @@ All Karma configuration abilities are well described in Karma's [documentation](
 
 ## webpack bundling
 
-For browser targets, the Kotlin/JS plugin uses the widely known [webpack](https://webpack.js.org/) module bundler.
+For browser targets, the Kotlin Multiplatform Gradle plugin uses the widely known [webpack](https://webpack.js.org/) module bundler.
 
 ### webpack version 
 
@@ -421,7 +503,7 @@ a `.js` file inside the `webpack.config.d` directory:
 
 > In this case, the configuration object is the `config` global object. You need to modify it in your script.
 >
-{type="note"}
+{style="note"}
 
 ```groovy
 config.module.rules.push({
@@ -429,7 +511,7 @@ config.module.rules.push({
     loader: 'loader-name'
 });
 ```
-     
+
 All webpack configuration
 capabilities are well described in its [documentation](https://webpack.js.org/concepts/configuration/).
 
@@ -441,7 +523,7 @@ and `browserProductionWebpack` Gradle tasks.
 * `browserDevelopmentWebpack` creates development artifacts, which are larger in size, but take little time to create.
 As such, use the `browserDevelopmentWebpack` tasks during active development.
 
-* `browserProductionWebpack` applies [dead code elimination](javascript-dce.md) to the generated artifacts and minifies
+* `browserProductionWebpack` applies dead code elimination to the generated artifacts and minifies
 the resulting JavaScript file, which takes more time, but generates executables that are smaller in size. As such, use
 the `browserProductionWebpack` task when preparing your project for production use.
  
@@ -484,7 +566,7 @@ browser {
 browser {
     commonWebpackConfig {
         cssSupport {
-            it.enabled.set(true)
+            it.enabled = true
         }
     }
 }
@@ -528,19 +610,19 @@ browser {
 browser {
     webpackTask {
         cssSupport {
-            it.enabled.set(true)
+            it.enabled = true
         }
     }
     runTask {
         cssSupport {
-            it.enabled.set(true)
+            it.enabled = true
         }
     }
     testTask {
         useKarma {
             // ...
             webpackConfig.cssSupport {
-                it.enabled.set(true)
+                it.enabled = true
             }
         }
     }
@@ -567,42 +649,101 @@ each of which defines a mode, as well as [include](https://webpack.js.org/config
 ## Node.js
 
 For Kotlin/JS projects targeting Node.js, the plugin automatically downloads and installs the Node.js environment on the
-host. You can also use an existing Node.js instance if you have it.
+host.
+You can also use an existing Node.js instance if you have it.
 
-### Use pre-installed Node.js
+### Configuring Node.js settings
 
-If Node.js is already installed on the host where you build Kotlin/JS projects, you can configure the Kotlin Multiplatform Gradle
-plugin to use it instead of installing its own Node.js instance.
+You can configure Node.js settings for each subproject, or set them for the project as a whole.
 
-To use the pre-installed Node.js instance, add the following lines to `build.gradle(.kts)`:
+For example, to set the Node.js version for a specific subproject, add the following lines to its Gradle block
+in your `build.gradle(.kts)` file:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
-    // "true" for default behavior
+project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
+    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "your Node.js version"
 }
- 
 ```
 
 </tab>
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin) {
-    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension).download = false
+project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
+    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "your Node.js version"
 }
 ```
 
 </tab>
 </tabs>
 
+To set a version for the entire project, including all subprojects, apply the same code to the `allProjects {}` block:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+allprojects {
+    project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
+        project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().version = "your Node.js version"
+    }
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```groovy
+allprojects {
+    project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
+        project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).version = "your Node.js version"
+}
+```
+
+</tab>
+</tabs>
+
+> Using the `NodeJsRootPlugin` class to configure Node.js setting for the entire project is deprecated and will eventually
+> stop being supported.
+> 
+{style="note"}
+
+### Use pre-installed Node.js
+
+If Node.js is already installed on the host where you build Kotlin/JS projects, you can configure the Kotlin Multiplatform Gradle
+plugin to use it instead of installing its own Node.js instance.
+
+To use a pre-installed Node.js instance, add the following lines to your `build.gradle(.kts)` file:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
+    // Set to `true` for default behavior
+    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().download = false
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```groovy
+project.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin) {
+    // Set to `true` for default behavior
+    project.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec).download = false
+}
+```
+
+</tab>
+</tabs>
 
 ## Yarn
 
-To download and install your declared dependencies at build time, the plugin manages its own instance of the
+By default, to download and install your declared dependencies at build time, the plugin manages its own instance of the
 [Yarn](https://yarnpkg.com/lang/en/) package manager. It works out of the box without additional configuration, but you
 can tune it or use Yarn already installed on your host.
 
@@ -654,7 +795,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 > Version locking via `kotlin-js-store` is available since Kotlin 1.6.10.
 >
-{type="note"}
+{style="note"}
 
 The `kotlin-js-store` directory in the project root is automatically generated by the Kotlin Multiplatform Gradle plugin to hold 
 the `yarn.lock` file, which is necessary for version locking. The lockfile is entirely managed by the Yarn plugin 
@@ -686,14 +827,14 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
         file("my-kotlin-js-store")
     rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).lockFileName = 'my-yarn.lock'
 }
-``` 
+```
 
 </tab>
 </tabs>
 
 > Changing the name of the lockfile may cause dependency inspection tools to no longer pick up the file.
 > 
-{type="warning"}
+{style="warning"}
 
 To learn more about `yarn.lock`, visit the [official Yarn documentation](https://classic.yarnpkg.com/lang/en/docs/yarn-lock/).
 
@@ -722,7 +863,7 @@ To use these options, update `build.gradle(.kts)` as follows:
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
-rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin::class.java) {
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
     rootProject.the<YarnRootExtension>().yarnLockMismatchReport =
         YarnLockMismatchReport.WARNING // NONE | FAIL
     rootProject.the<YarnRootExtension>().reportNewYarnLock = false // true
@@ -752,7 +893,7 @@ rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 
 > Installing npm dependencies with `--ignore-scripts` by default is available since Kotlin 1.6.10.
 >
-{type="note"}
+{style="note"}
 
 To reduce the likelihood of executing malicious code from compromised npm packages, the Kotlin Multiplatform Gradle plugin prevents 
 the execution of [lifecycle scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)
@@ -776,7 +917,7 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
 rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin) {
     rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).ignoreScripts = false
 }
-``` 
+```
 
 </tab>
 </tabs>
@@ -787,10 +928,9 @@ By default, the results of a Kotlin/JS project build reside in the `/build/dist/
 
 > Prior to Kotlin 1.9.0, the default distribution target directory was `/build/distributions`.
 >
-{type="note" }
+{style="note" }
 
-To set another location for project distribution files, add the `distribution {}` block inside `browser {}` in the build script and 
-assign a value to the `directory` property.
+To set another location for project distribution files, in your build script inside the `browser {}` block, add a `distribution {}` block and assign a value to the `outputDirectory` property by using the `set()` method.
 Once you run a project build task, Gradle will save the output bundle in this location together with project resources.
 
 <tabs group="build-script">
@@ -801,7 +941,7 @@ kotlin {
     js {
         browser {
             distribution {
-                directory = File("$projectDir/output/")
+                outputDirectory.set(projectDir.resolve("output"))
             }
         }
         binaries.executable()
@@ -818,7 +958,7 @@ kotlin {
     js {
         browser {
             distribution {
-                directory = file("$projectDir/output/")
+                outputDirectory = file("$projectDir/output")
             }
         }
         binaries.executable()
@@ -833,11 +973,11 @@ kotlin {
 ## Module name
 
 To adjust the name for the JavaScript _module_ (which is generated in `build/js/packages/myModuleName`), including
-the corresponding `.js` and `.d.ts` files, use the `moduleName` option:
+the corresponding `.js` and `.d.ts` files, use the `outputModuleName` option:
 
 ```groovy
 js {
-    moduleName = "myModuleName"
+    outputModuleName = "myModuleName"
 }
 ```
 
@@ -877,10 +1017,3 @@ When you build the project, this code adds the following block to the `package.j
 ```
 
 Learn more about writing `package.json` files for npm registry in the [npm docs](https://docs.npmjs.com/cli/v6/configuring-npm/package-json).
-
-## Troubleshooting
-
-When building a Kotlin/JS project using Kotlin 1.3.xx, you may encounter a Gradle error if one of your dependencies (or
-any transitive dependency) was built using Kotlin 1.4 or higher:
-`Could not determine the dependencies of task ':client:jsTestPackageJson'.` / `Cannot choose between the following variants`.
-This is a known problem, a workaround is provided [here](https://youtrack.jetbrains.com/issue/KT-40226).
