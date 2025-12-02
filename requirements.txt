@@ -5,7 +5,7 @@ Pygments==2.12.0
 python-frontmatter==1.0.0
 beautifulsoup4==4.14.2
 xmltodict==0.13.0
-geocoder==1.38
+geocoder==1.38.1
 ruamel.yaml==0.17.21
 algoliasearch==1.20.0
 Werkzeug==3.0.6
