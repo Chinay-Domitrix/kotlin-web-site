@@ -1838,15 +1838,14 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/checkbox@^0.4.13":
-  version "0.4.13"
-  resolved "https://registry.npmjs.org/@rescui/checkbox/-/checkbox-0.4.13.tgz"
-  integrity sha512-/fSaix9Zat75vz/Snm1sOCy4lN5hICyMijosDoqTCtTjH3OKW6T8OP0y09hSIklF/NqBTkgHzpTP5p/69ZNYWQ==
+"@rescui/checkbox@^0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@rescui/checkbox/-/checkbox-0.9.2.tgz#9d568d5ece0f29f360989edfbf49cc121c251cce"
+  integrity sha512-ueGKkZbMBka5yg+8JTDY/y4+/WH3b4eCWKYVq/zC7XWJx+pLBXTox+qz9mBfWI+3k8ILxAllkzTzpUtSBnBjtg==
   dependencies:
-    "@babel/runtime-corejs3" "^7.14.0"
-    "@rescui/menu" "^0.8.2"
+    "@babel/runtime-corejs3" "^7.26.0"
+    "@rescui/menu" "^0.12.2"
     classnames "^2.2.6"
-    core-js "^3.9.1"
 
 "@rescui/colors@^0.1.6":
   version "0.1.6"
@@ -1931,7 +1930,7 @@
     classnames "^2.2.6"
     core-js "^3.9.1"
 
-"@rescui/menu@0.9.4":
+"@rescui/menu@0.9.4", "@rescui/menu@^0.9.1":
   version "0.9.4"
   resolved "https://registry.npmjs.org/@rescui/menu/-/menu-0.9.4.tgz"
   integrity sha512-ha7FN6AOTIk48e4Bc0fdEH5Ehhzt4Vrm0vaRObD9ukjbUxdq1R0aGmlTeXe/GcM2GGfEqfYJnfmSCYdKDxsdaQ==
@@ -1941,24 +1940,13 @@
     core-js "^3"
     nanoid "^3.3.3"
 
-"@rescui/menu@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.npmjs.org/@rescui/menu/-/menu-0.8.2.tgz"
-  integrity sha512-PuHr9lh21mVZEc8CB0vRUTTA+dBi0mbkQ1igExALefQ7MXXdv10jUnIXLWdPzwyrZGpH8cSAixFukORFxo7HmA==
+"@rescui/menu@^0.12.2":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@rescui/menu/-/menu-0.12.2.tgz#9750be60324e8145afc5f1c294d35f7e243638d5"
+  integrity sha512-zm4w7tVIsIpRN7pGCUJlLKURu+7v6WaU0e/eQxFD8A2qAcTQ/XwuwYalPg1oFHc4jXkK6ohZZyKgJjZHspBKHQ==
   dependencies:
-    "@babel/runtime-corejs3" "^7.11.0"
+    "@babel/runtime-corejs3" "^7.26.0"
     classnames "^2.2.6"
-    core-js "^3"
-    nanoid "^3.3.3"
-
-"@rescui/menu@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.npmjs.org/@rescui/menu/-/menu-0.9.1.tgz"
-  integrity sha512-RfskXseYMIFnYRRlKxcDkBVl9gSNLnDLSvWhylAF/BSyroALCmZpYNX/C6bR1CC0l1OtKtgDu6DGKPw4hc4UeQ==
-  dependencies:
-    "@babel/runtime-corejs3" "^7.11.0"
-    classnames "^2.2.6"
-    core-js "^3"
     nanoid "^3.3.3"
 
 "@rescui/switcher@0.12.3":
