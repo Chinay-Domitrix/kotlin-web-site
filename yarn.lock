@@ -1895,15 +1895,6 @@
     "@babel/runtime-corejs3" "^7.14.0"
     core-js "^3.9.1"
 
-"@rescui/icons@^0.11.2":
-  version "0.11.2"
-  resolved "https://registry.npmjs.org/@rescui/icons/-/icons-0.11.2.tgz"
-  integrity sha512-B/zQxNhRNrorxprn2zUbnHPtMDQcNdjVaoiI42mSxCoi6FpR3VlCTnVU5Li5ZlCWNRvuN0uNSVgVbbBNG3rNwQ==
-  dependencies:
-    "@babel/runtime-corejs3" "^7.14.0"
-    classnames "^2.2.6"
-    core-js "^3.9.1"
-
 "@rescui/icons@^0.13.0":
   version "0.13.0"
   resolved "https://registry.npmjs.org/@rescui/icons/-/icons-0.13.0.tgz"
@@ -1921,15 +1912,13 @@
     "@babel/runtime-corejs3" "^7.26.0"
     classnames "^2.2.6"
 
-"@rescui/input@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.npmjs.org/@rescui/input/-/input-0.8.2.tgz"
-  integrity sha512-LP2flmPn4Z/A5O8NelTj7TnGxZV+nwbK9omBhw4cIjQJx2o8G5aN6cuGpfvECsiGSnAdMF82ol9htCEylrQM5g==
+"@rescui/input@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@rescui/input/-/input-0.13.0.tgz#a23c27058e0791c8655c8d9b58dec5c73d4e5cae"
+  integrity sha512-jln+X5dMuyrivuFdAlI74TIlc5KLwsMO79ExOKLElGc8V3JTeHtg9TDh+MA62QLl/No6gnD+MYbewApSJAKN3Q==
   dependencies:
-    "@babel/runtime-corejs3" "^7.14.0"
-    "@rescui/icons" "^0.11.2"
+    "@babel/runtime-corejs3" "^7.26.0"
     classnames "^2.2.6"
-    core-js "^3.9.1"
 
 "@rescui/menu@0.9.4":
   version "0.9.4"
